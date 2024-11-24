@@ -14,14 +14,72 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+import { TableCellRooms } from '../auth/components/table-cell-rooms'
 
 const items = [
-  { title: 'Sala 01' },
-  { title: 'Sala 02' },
-  { title: 'Sala 03' },
-  { title: 'Sala 04' },
-  { title: 'Sala 05' },
-  { title: 'Sala 06' },
+  {
+    id: 1,
+    title: 'Sala 01',
+    segunda: 'disponivel',
+    terça: 'disponivel',
+    quarta: 'parcialmente',
+    quinta: 'disponivel',
+    sexta: 'indisponivel',
+  },
+  {
+    id: 2,
+    title: 'Sala 02',
+    segunda: 'indisponivel',
+    terça: 'parcialmente',
+    quarta: 'disponivel',
+    quinta: 'parcialmente',
+    sexta: 'indisponivel',
+  },
+  {
+    id: 3,
+    title: 'Sala 03',
+    segunda: 'parcialmente',
+    terça: 'disponivel',
+    quarta: 'indisponivel',
+    quinta: 'disponivel',
+    sexta: 'parcialmente',
+  },
+  {
+    id: 4,
+    title: 'Sala 04',
+    segunda: 'disponivel',
+    terça: 'indisponivel',
+    quarta: 'parcialmente',
+    quinta: 'indisponivel',
+    sexta: 'disponivel',
+  },
+  {
+    id: 5,
+    title: 'Sala 05',
+    segunda: 'parcialmente',
+    terça: 'parcialmente',
+    quarta: 'disponivel',
+    quinta: 'disponivel',
+    sexta: 'indisponivel',
+  },
+  {
+    id: 6,
+    title: 'Sala 06',
+    segunda: 'indisponivel',
+    terça: 'disponivel',
+    quarta: 'parcialmente',
+    quinta: 'disponivel',
+    sexta: 'parcialmente',
+  },
 ]
 
 export function Home() {
@@ -82,12 +140,30 @@ export function Home() {
             </Dialog>
           </div>
         </div>
-
-        <div>
-          {items.map((item) => (
-            <div key={item.title}>{item.title}</div>
-          ))}
-        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead>Segunda</TableHead>
+              <TableHead>Terça</TableHead>
+              <TableHead>Quarta</TableHead>
+              <TableHead>Quinta</TableHead>
+              <TableHead>Sexta</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.title}</TableCell>
+                <TableCellRooms item={item.segunda} />
+                <TableCellRooms item={item.terça} />
+                <TableCellRooms item={item.quarta} />
+                <TableCellRooms item={item.quinta} />
+                <TableCellRooms item={item.sexta} />
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </>
   )

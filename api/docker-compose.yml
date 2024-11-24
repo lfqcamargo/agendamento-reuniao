@@ -1,0 +1,12 @@
+services:
+  postgres:
+    container_name: meeting_rooms
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: meeting_rooms
+    volumes:
+      - ./data/pg:/data/postgres
