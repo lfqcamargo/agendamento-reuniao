@@ -29,6 +29,7 @@ model User {
   companyId String    @map("company_id")
   email     String    @unique
   name      String
+  nickname  String    @map("nick_name")
   password  String
   role      Int
   createdAt DateTime  @default(now()) @map("created_at")

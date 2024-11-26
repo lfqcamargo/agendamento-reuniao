@@ -27,4 +27,18 @@ export class InMemoryUserRepository implements UserRepository {
 
     return user
   }
+
+  async findByNickname(companyId: string, nickname: string) {
+    const user = this.items.find(
+      (item) =>
+        item.companyId.toString() === companyId &&
+        item.nickname.toString() === nickname,
+    )
+
+    if (!user) {
+      return null
+    }
+
+    return user
+  }
 }

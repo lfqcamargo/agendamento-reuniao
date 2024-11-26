@@ -15,6 +15,7 @@ export function makeUser(
       companyId: new UniqueEntityID(faker.string.uuid()),
       email: faker.internet.email(),
       name: faker.person.fullName(),
+      nickname: faker.internet.username(),
       password: faker.internet.password(),
       role: faker.number.int(1),
       ...override,

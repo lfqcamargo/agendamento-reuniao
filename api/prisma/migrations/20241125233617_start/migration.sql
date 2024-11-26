@@ -14,6 +14,7 @@ CREATE TABLE "users" (
     "company_id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "nick_name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -33,7 +33,8 @@ describe('CreateCompanyAndUserUseCase', () => {
       cnpj: company.cnpj,
       companyName: company.name,
       email: user.email,
-      userName: user.name,
+      name: user.name,
+      nickname: user.name,
       password: user.password,
     })
 
@@ -54,7 +55,8 @@ describe('CreateCompanyAndUserUseCase', () => {
       cnpj: company.cnpj,
       companyName: company.name,
       email: user.email,
-      userName: user.name,
+      name: user.name,
+      nickname: user.name,
       password: user.password,
     })
 
@@ -73,7 +75,8 @@ describe('CreateCompanyAndUserUseCase', () => {
       cnpj: company.cnpj,
       companyName: company.name,
       email: user.email,
-      userName: user.name,
+      name: user.name,
+      nickname: user.name,
       password: user.password,
     })
 

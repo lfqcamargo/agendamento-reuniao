@@ -6,6 +6,7 @@ export interface UserProps {
   companyId: UniqueEntityID
   email: string
   name: string
+  nickname: string
   password: string
   role: number
   createdAt: Date
@@ -23,6 +24,10 @@ export class User extends Entity<UserProps> {
 
   get name() {
     return this.props.name
+  }
+
+  get nickname() {
+    return this.props.nickname
   }
 
   get password() {

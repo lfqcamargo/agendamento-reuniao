@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common'
+
 import { Either, left, right } from '@/core/either'
 import { CompanyRepository } from '@/domain/users/application/repositories/company-repository'
 
@@ -11,6 +13,7 @@ interface CreateCompanyRequest {
 
 type CreateCompanyUseCaseResponse = Either<AlreadyExistsCnpjError, null>
 
+@Injectable()
 export class CreateCompanyUseCase {
   constructor(private companyRepository: CompanyRepository) {}
 

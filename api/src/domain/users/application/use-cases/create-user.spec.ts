@@ -1,9 +1,11 @@
 import { FakeHasher } from 'test/cryptography/fake-hasher'
+import { makeCompany } from 'test/factories/make-company'
 import { makeUser } from 'test/factories/make-user'
 import { InMemoryUserRepository } from 'test/repositories/in-memory-user-repository'
 
 import { CreateUserUseCase } from './create-user'
 import { AlreadyExistsEmailError } from './errors/already-exists-email-error'
+import { AlreadyExistsNicknameError } from './errors/already-exists-nickname-error'
 
 let inMemoryUserRepository: InMemoryUserRepository
 let fakeHasher: FakeHasher
@@ -23,6 +25,7 @@ describe('CreateUserUseCase', () => {
       companyId: user.companyId.toString(),
       email: user.email,
       name: user.name,
+      nickname: user.nickname,
       password: user.password,
       role: user.role,
     })
@@ -45,11 +48,30 @@ describe('CreateUserUseCase', () => {
       companyId: user.id.toString(),
       email: user.email,
       name: user.name,
+      nickname: user.nickname,
       password: user.password,
       role: user.role,
     })
 
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(AlreadyExistsEmailError)
+  })
+
+  it('it should not be possible to create a new user with an existing nickname in the same company', async () => {
+    const company = makeCompany()
+    const user = makeUser({ companyId: company.id })
+    inMemoryUserRepository.items.push(user)
+
+    const result = await sut.execute({
+      companyId: company.id.toString(),
+      email: 'lfqcamargo@gmail.com',
+      name: user.name,
+      nickname: user.nickname,
+      password: user.password,
+      role: user.role,
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(AlreadyExistsNicknameError)
   })
 })

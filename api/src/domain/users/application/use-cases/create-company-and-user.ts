@@ -17,7 +17,8 @@ interface CreateCompanyRequest {
 
 interface CreateUserRequest {
   email: string
-  userName: string
+  name: string
+  nickname: string
   password: string
 }
 
@@ -40,7 +41,8 @@ export class CreateCompanyAndUserUseCase {
     cnpj,
     companyName,
     email,
-    userName,
+    name,
+    nickname,
     password,
   }: CreateCompanyAndUserRequest): Promise<CreateCompanyAndUserUseCaseResponse> {
     const alreadyCnpj = await this.companyRepository.findByCnpj(cnpj)
@@ -65,7 +67,8 @@ export class CreateCompanyAndUserUseCase {
     const user = User.create({
       companyId: company.id,
       email,
-      name: userName,
+      name,
+      nickname,
       password: hashedPassword,
       role: 1,
     })
