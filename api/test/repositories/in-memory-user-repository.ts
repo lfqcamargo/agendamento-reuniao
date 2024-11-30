@@ -41,4 +41,32 @@ export class InMemoryUserRepository implements UserRepository {
 
     return user
   }
+
+  async fetchAllAdmins(companyId: string) {
+    const users = this.items.filter(
+      (item) => item.companyId.toString() === companyId,
+    )
+
+    if (!users) {
+      return null
+    }
+
+    return users
+  }
+
+  async save(data: User) {
+    const itemIndex = this.items.findIndex(
+      (item) => item.id.toString() === data.id.toString(),
+    )
+
+    this.items[itemIndex] = data
+  }
+
+  async delete(user: User) {
+    const itemIndex = this.items.findIndex(
+      (item) => item.id.toString() === user.id.toString(),
+    )
+
+    this.items.splice(itemIndex, 1)
+  }
 }

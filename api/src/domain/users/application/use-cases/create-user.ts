@@ -2,15 +2,17 @@ import { Injectable } from '@nestjs/common'
 
 import { Either, left, right } from '@/core/either'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { User } from '../../enterprise/entities/user'
 import { HashGenerator } from '../cryptography/hash-generator'
 import { UserRepository } from '../repositories/user-repository'
 import { AlreadyExistsEmailError } from './errors/already-exists-email-error'
 import { AlreadyExistsNicknameError } from './errors/already-exists-nickname-error'
+import { InvalidRoleError } from './errors/invalid-role-error'
 
 interface CreateUserUseCaseRequest {
-  companyId: string
+  id: string
   email: string
   name: string
   nickname: string
@@ -18,7 +20,10 @@ interface CreateUserUseCaseRequest {
   role: number
 }
 
-type CreateUserUseCaseResponse = Either<AlreadyExistsEmailError, null>
+type CreateUserUseCaseResponse = Either<
+  AlreadyExistsEmailError | ResourceNotFoundError,
+  null
+>
 
 @Injectable()
 export class CreateUserUseCase {
@@ -28,13 +33,25 @@ export class CreateUserUseCase {
   ) {}
 
   async execute({
-    companyId,
+    id,
     email,
     name,
     nickname,
     password,
     role,
   }: CreateUserUseCaseRequest): Promise<CreateUserUseCaseResponse> {
+    const validRoles = [1, 2] // Admin (1), User (2)
+
+    if (!validRoles.includes(role)) {
+      return left(new InvalidRoleError())
+    }
+
+    const userAuthenticate = await this.userRepository.findById(id)
+
+    if (!userAuthenticate) {
+      return left(new ResourceNotFoundError('User not found.'))
+    }
+
     const alreadyEmail = await this.userRepository.findByEmail(email)
 
     if (alreadyEmail) {
@@ -42,7 +59,7 @@ export class CreateUserUseCase {
     }
 
     const alreadynickname = await this.userRepository.findByNickname(
-      companyId,
+      userAuthenticate.companyId.toString(),
       nickname,
     )
 
@@ -53,12 +70,13 @@ export class CreateUserUseCase {
     const hashedPassword = await this.hashGenerator.hash(password)
 
     const user = User.create({
-      companyId: new UniqueEntityID(companyId),
+      companyId: new UniqueEntityID(userAuthenticate.companyId.toString()),
       email,
       name,
       nickname,
       password: hashedPassword,
       role,
+      active: true,
     })
 
     await this.userRepository.create(user)

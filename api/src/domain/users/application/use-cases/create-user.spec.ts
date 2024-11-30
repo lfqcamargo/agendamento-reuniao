@@ -6,6 +6,7 @@ import { InMemoryUserRepository } from 'test/repositories/in-memory-user-reposit
 import { CreateUserUseCase } from './create-user'
 import { AlreadyExistsEmailError } from './errors/already-exists-email-error'
 import { AlreadyExistsNicknameError } from './errors/already-exists-nickname-error'
+import { InvalidRoleError } from './errors/invalid-role-error'
 
 let inMemoryUserRepository: InMemoryUserRepository
 let fakeHasher: FakeHasher
@@ -73,5 +74,19 @@ describe('CreateUserUseCase', () => {
 
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(AlreadyExistsNicknameError)
+  })
+
+  it('should not allow creating a user with an invalid role', async () => {
+    const result = await sut.execute({
+      companyId: 'company-id',
+      email: 'test@example.com',
+      name: 'Test User',
+      nickname: 'testuser',
+      password: 'password123',
+      role: 99,
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(InvalidRoleError)
   })
 })

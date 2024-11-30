@@ -71,6 +71,7 @@ export class CreateCompanyAndUserUseCase {
       nickname,
       password: hashedPassword,
       role: 1,
+      active: true,
     })
 
     await this.companyRepository.create(company)

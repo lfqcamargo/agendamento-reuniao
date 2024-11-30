@@ -9,6 +9,7 @@ export interface UserProps {
   nickname: string
   password: string
   role: number
+  active: boolean
   createdAt: Date
   lastLogin?: Date | null
 }
@@ -38,6 +39,10 @@ export class User extends Entity<UserProps> {
     return this.props.role
   }
 
+  get active() {
+    return this.props.active
+  }
+
   get createdAt() {
     return this.props.createdAt
   }
@@ -50,12 +55,20 @@ export class User extends Entity<UserProps> {
     this.props.name = name
   }
 
+  set nickname(nickname: string) {
+    this.props.nickname = nickname
+  }
+
   set password(password: string) {
     this.props.password = password
   }
 
   set role(role: number) {
     this.props.role = role
+  }
+
+  set active(active: boolean) {
+    this.props.active = active
   }
 
   static create(props: Optional<UserProps, 'createdAt'>, id?: UniqueEntityID) {

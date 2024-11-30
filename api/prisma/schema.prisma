@@ -32,6 +32,7 @@ model User {
   nickname  String    @map("nick_name")
   password  String
   role      Int
+  active    Boolean
   createdAt DateTime  @default(now()) @map("created_at")
   lastLogin DateTime? @map("last_login")
 

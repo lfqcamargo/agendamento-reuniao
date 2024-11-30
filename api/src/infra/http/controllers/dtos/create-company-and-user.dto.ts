@@ -31,10 +31,10 @@ export class CreateCompanyAndUserSchemaDto {
 
   @ApiProperty({
     example: 'lfqcamargo',
-    description: 'Admin username',
+    description: 'Admin nickname',
     type: String,
   })
-  userName!: string
+  nickname!: string
 
   @ApiProperty({
     example: '123456789lfqcamargo',

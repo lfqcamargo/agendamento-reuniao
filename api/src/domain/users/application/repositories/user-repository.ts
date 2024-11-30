@@ -8,4 +8,8 @@ export abstract class UserRepository {
     companyId: string,
     nickname: string,
   ): Promise<User | null>
+
+  abstract fetchAllAdmins(companyId: string): Promise<User[] | null>
+  abstract save(user: User): Promise<void>
+  abstract delete(user: User): Promise<void>
 }

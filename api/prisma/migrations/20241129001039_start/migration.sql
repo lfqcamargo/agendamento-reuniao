@@ -17,6 +17,7 @@ CREATE TABLE "users" (
     "nick_name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" INTEGER NOT NULL,
+    "active" BOOLEAN NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "last_login" TIMESTAMP(3),
 

@@ -63,4 +63,33 @@ export class PrismaUserRepository implements UserRepository {
 
     return PrismaUserMapper.toDomain(user)
   }
+
+  async fetchAllAdmins(companyId: string) {
+    const usersAdmin = await this.prisma.user.findMany({
+      where: {
+        companyId,
+      },
+    })
+
+    return usersAdmin.map(PrismaUserMapper.toDomain)
+  }
+
+  async save(user: User): Promise<void> {
+    const data = PrismaUserMapper.toPrisma(user)
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id.toString(),
+      },
+      data,
+    })
+  }
+
+  async delete(user: User): Promise<void> {
+    await this.prisma.user.delete({
+      where: {
+        id: user.id.toString(),
+      },
+    })
+  }
 }

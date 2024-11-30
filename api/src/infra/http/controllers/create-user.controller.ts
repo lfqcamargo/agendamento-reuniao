@@ -17,6 +17,7 @@ import { z } from 'zod'
 
 import { CreateUserUseCase } from '@/domain/users/application/use-cases/create-user'
 import { AlreadyExistsEmailError } from '@/domain/users/application/use-cases/errors/already-exists-email-error'
+import { InvalidRoleError } from '@/domain/users/application/use-cases/errors/invalid-role-error'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
 
@@ -49,7 +50,7 @@ export class CreateUserController {
   })
   @ApiResponse({
     status: 409,
-    description: 'Conflict - Either the email or the CNPJ already exists.',
+    description: 'Conflict - Either the email or the nickname already exists.',
     content: {
       'application/json': {
         examples: {
@@ -79,10 +80,10 @@ export class CreateUserController {
     @CurrentUser() user: UserPayload,
   ) {
     const { email, name, nickname, password, role } = body
-    const companyId = user.company
+    const id = user.sub
 
     const result = await this.createUserUseCase.execute({
-      companyId,
+      id,
       email,
       name,
       nickname,
@@ -96,6 +97,8 @@ export class CreateUserController {
       switch (error.constructor) {
         case AlreadyExistsEmailError:
           throw new ConflictException(error.message)
+        case InvalidRoleError:
+          throw new BadRequestException(error.message)
         default:
           throw new BadRequestException(error.message)
       }
