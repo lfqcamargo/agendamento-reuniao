@@ -26,7 +26,7 @@ describe('DeleteUserUseCase', () => {
 
     const result = await sut.execute({
       adminId: adminUser.id.toString(),
-      userId: userToDelete.id.toString(),
+      id: userToDelete.id.toString(),
     })
 
     expect(result.isRight()).toBe(true)
@@ -37,7 +37,7 @@ describe('DeleteUserUseCase', () => {
   it('should not delete a user if admin does not exist', async () => {
     const result = await sut.execute({
       adminId: 'non-existent-admin',
-      userId: 'non-existent-user',
+      id: 'non-existent-user',
     })
 
     expect(result.isRight()).toBe(false)
@@ -53,7 +53,7 @@ describe('DeleteUserUseCase', () => {
 
     const result = await sut.execute({
       adminId: nonAdminUser.id.toString(),
-      userId: userToDelete.id.toString(),
+      id: userToDelete.id.toString(),
     })
 
     expect(result.isRight()).toBe(false)
@@ -67,7 +67,7 @@ describe('DeleteUserUseCase', () => {
 
     const result = await sut.execute({
       adminId: adminUser.id.toString(),
-      userId: 'non-existent-user',
+      id: 'non-existent-user',
     })
 
     expect(result.isRight()).toBe(false)
@@ -81,7 +81,7 @@ describe('DeleteUserUseCase', () => {
 
     const result = await sut.execute({
       adminId: adminUser.id.toString(),
-      userId: adminUser.id.toString(),
+      id: adminUser.id.toString(),
     })
 
     expect(result.isRight()).toBe(false)
@@ -97,7 +97,7 @@ describe('DeleteUserUseCase', () => {
 
     const result = await sut.execute({
       adminId: adminUser.id.toString(),
-      userId: userToDelete.id.toString(),
+      id: userToDelete.id.toString(),
     })
 
     expect(result.isRight()).toBe(false)
