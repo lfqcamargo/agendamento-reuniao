@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { signIn } from '@/api/sign-in'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -19,6 +21,10 @@ type SignInForm = z.infer<typeof signInFormSchema>
 export function SignIn() {
   const [searchParams] = useSearchParams()
 
+  const { mutateAsync: signInFn } = useMutation({
+    mutationFn: signIn,
+  })
+
   const {
     register,
     handleSubmit,
@@ -32,9 +38,21 @@ export function SignIn() {
     },
   })
 
-  function handleSignIn(data: SignInForm) {
-    console.log(data)
-    toast.error('Credenciais Inválidas!')
+  async function handleSignIn(data: SignInForm) {
+    try {
+      const response = await signInFn({
+        email: data.email,
+        password: data.password,
+      })
+      if (response.access_token) {
+        localStorage.setItem('access_token', response.access_token)
+        window.location.href = '/'
+        toast.success('Login realizado com sucesso!')
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error('Credenciais Inválidas!')
+    }
   }
 
   const emailWatch = watch('email')

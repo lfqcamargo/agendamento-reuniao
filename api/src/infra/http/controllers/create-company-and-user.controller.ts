@@ -20,9 +20,9 @@ import { CreateCompanyAndUserSchemaDto } from './dtos/create-company-and-user.dt
 
 const createCompanyAndUserSchema = z.object({
   cnpj: z.string().length(14),
-  companyName: z.string().min(4).max(20),
+  companyName: z.string().min(4).max(50),
   email: z.string().min(10).max(30),
-  name: z.string().min(4).max(50),
+  userName: z.string().min(4).max(50),
   nickname: z.string().min(4).max(20),
   password: z.string().min(6).max(20),
 })
@@ -69,13 +69,13 @@ export class CreateCompanyAndUserController {
   })
   @UsePipes(new ZodValidationPipe(createCompanyAndUserSchema))
   async handle(@Body() body: CreateCompanyAndUserSchema) {
-    const { cnpj, companyName, email, name, nickname, password } = body
+    const { cnpj, companyName, email, userName, nickname, password } = body
 
     const result = await this.createCompanyAndUserUseCase.execute({
       cnpj,
       companyName,
       email,
-      name,
+      name: userName,
       nickname,
       password,
     })

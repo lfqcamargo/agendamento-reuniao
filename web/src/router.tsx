@@ -10,31 +10,38 @@ import { Users } from './pages/app/settings/users'
 import { RecoveryPassword } from './pages/auth/recovery-password'
 import { SignIn } from './pages/auth/sign-in'
 import { SignUp } from './pages/auth/sign-up'
+import { ProtectedRoute } from './utils/auth'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: 'settings',
-        element: <SettingsLayout />,
+        path: '/',
+        element: <AppLayout />,
         children: [
           {
-            path: 'rooms',
-            element: <Rooms />,
+            index: true,
+            element: <Home />,
           },
           {
-            path: 'users',
-            element: <Users />,
-          },
-          {
-            path: 'account',
-            element: <Account />,
+            path: 'settings',
+            element: <SettingsLayout />,
+            children: [
+              {
+                path: 'rooms',
+                element: <Rooms />,
+              },
+              {
+                path: 'users',
+                element: <Users />,
+              },
+              {
+                path: 'account',
+                element: <Account />,
+              },
+            ],
           },
         ],
       },
