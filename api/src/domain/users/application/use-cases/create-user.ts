@@ -12,7 +12,7 @@ import { AlreadyExistsNicknameError } from './errors/already-exists-nickname-err
 import { InvalidRoleError } from './errors/invalid-role-error'
 
 interface CreateUserUseCaseRequest {
-  id: string
+  userAuthenticateId: string
   email: string
   name: string
   nickname: string
@@ -33,7 +33,7 @@ export class CreateUserUseCase {
   ) {}
 
   async execute({
-    id,
+    userAuthenticateId,
     email,
     name,
     nickname,
@@ -46,7 +46,8 @@ export class CreateUserUseCase {
       return left(new InvalidRoleError())
     }
 
-    const userAuthenticate = await this.userRepository.findById(id)
+    const userAuthenticate =
+      await this.userRepository.findById(userAuthenticateId)
 
     if (!userAuthenticate) {
       return left(new ResourceNotFoundError('User not found.'))

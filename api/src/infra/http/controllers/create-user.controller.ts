@@ -80,10 +80,10 @@ export class CreateUserController {
     @CurrentUser() user: UserPayload,
   ) {
     const { email, name, nickname, password, role } = body
-    const id = user.sub
+    const userAuthenticateId = user.sub
 
     const result = await this.createUserUseCase.execute({
-      id,
+      userAuthenticateId,
       email,
       name,
       nickname,

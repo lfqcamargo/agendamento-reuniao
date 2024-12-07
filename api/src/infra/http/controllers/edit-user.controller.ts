@@ -5,6 +5,7 @@ import {
   Controller,
   ForbiddenException,
   HttpCode,
+  NotFoundException,
   Put,
 } from '@nestjs/common'
 import {
@@ -155,7 +156,7 @@ export class EditUserController {
         case AlreadyExistsNicknameError:
           throw new ConflictException(error.message)
         case ResourceNotFoundError:
-          throw new ResourceNotFoundError(error.message)
+          throw new NotFoundException(error.message)
         case SystemDoesNotAllowError:
           throw new ForbiddenException(error.message)
         case InvalidRoleError:

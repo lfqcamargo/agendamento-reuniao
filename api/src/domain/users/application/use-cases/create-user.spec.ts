@@ -25,7 +25,7 @@ describe('CreateUserUseCase', () => {
     inMemoryUserRepository.items.push(userAdmin)
 
     const result = await sut.execute({
-      id: userAdmin.id.toString(),
+      userAuthenticateId: userAdmin.id.toString(),
       email: user.email,
       name: user.name,
       nickname: user.nickname,
@@ -48,7 +48,7 @@ describe('CreateUserUseCase', () => {
     inMemoryUserRepository.items.push(user)
 
     const result = await sut.execute({
-      id: user.id.toString(),
+      userAuthenticateId: user.id.toString(),
       email: user.email,
       name: user.name,
       nickname: user.nickname,
@@ -66,7 +66,7 @@ describe('CreateUserUseCase', () => {
     inMemoryUserRepository.items.push(user)
 
     const result = await sut.execute({
-      id: user.id.toString(),
+      userAuthenticateId: user.id.toString(),
       email: 'lfqcamargo@gmail.com',
       name: user.name,
       nickname: user.nickname,
@@ -80,7 +80,7 @@ describe('CreateUserUseCase', () => {
 
   it('should not allow creating a user with an invalid role', async () => {
     const result = await sut.execute({
-      id: 'company-id',
+      userAuthenticateId: 'company-id',
       email: 'test@example.com',
       name: 'Test User',
       nickname: 'testuser',

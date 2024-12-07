@@ -9,7 +9,7 @@ import { UserNotCompanyError } from '@/core/errors/user-not-company'
 import { UserRepository } from '../repositories/user-repository'
 
 interface DeleteUserUseCaseRequest {
-  adminId: string
+  userAuthenticateId: string
   id: string
 }
 
@@ -26,13 +26,13 @@ export class DeleteUserUseCase {
   constructor(private userRepository: UserRepository) {}
 
   async execute({
-    adminId,
+    userAuthenticateId,
     id,
   }: DeleteUserUseCaseRequest): Promise<DeleteUserUseCaseResponse> {
-    const userAdmin = await this.userRepository.findById(adminId)
+    const userAdmin = await this.userRepository.findById(userAuthenticateId)
 
     if (!userAdmin) {
-      return left(new ResourceNotFoundError('User admin not found.'))
+      return left(new ResourceNotFoundError('User not found.'))
     }
 
     if (userAdmin.role !== 1) {

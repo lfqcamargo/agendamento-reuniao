@@ -10,6 +10,11 @@ export abstract class UserRepository {
   ): Promise<User | null>
 
   abstract fetchAllAdmins(companyId: string): Promise<User[] | null>
+  abstract fetchUsersByCompanyId(
+    companyId: string,
+    page: number,
+  ): Promise<User[] | null>
+
   abstract save(user: User): Promise<void>
   abstract delete(user: User): Promise<void>
 }

@@ -5,6 +5,7 @@ import {
   Delete,
   ForbiddenException,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -107,10 +108,10 @@ export class DeleteUserController {
     @CurrentUser() user: UserPayload,
   ) {
     const { id } = body
-    const adminId = user.sub
+    const userAuthenticateId = user.sub
 
     const result = await this.deleteUserUseCase.execute({
-      adminId,
+      userAuthenticateId,
       id,
     })
 
@@ -119,7 +120,7 @@ export class DeleteUserController {
 
       switch (error.constructor) {
         case ResourceNotFoundError:
-          throw new ResourceNotFoundError(error.message)
+          throw new NotFoundException(error.message)
         case UserNotAdminError:
           throw new BadRequestException(error.message)
         case SystemDoesNotAllowError:

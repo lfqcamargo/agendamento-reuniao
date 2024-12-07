@@ -25,13 +25,13 @@ const items = [
     icon: Calendar,
   },
   {
-    title: 'Procurar',
+    title: 'Salas',
     url: '#',
     icon: Search,
   },
   {
-    title: 'Configurações',
-    url: '/settings/rooms',
+    title: 'Usuários',
+    url: '/users',
     icon: Settings,
   },
 ]

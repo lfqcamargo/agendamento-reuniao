@@ -74,6 +74,25 @@ export class PrismaUserRepository implements UserRepository {
     return usersAdmin.map(PrismaUserMapper.toDomain)
   }
 
+  async fetchUsersByCompanyId(companyId: string, page: number) {
+    const users = await this.prisma.user.findMany({
+      where: {
+        companyId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      take: 20,
+      skip: (page - 1) * 20,
+    })
+
+    if (!users) {
+      return null
+    }
+
+    return users.map(PrismaUserMapper.toDomain)
+  }
+
   async save(user: User): Promise<void> {
     const data = PrismaUserMapper.toPrisma(user)
 

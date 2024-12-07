@@ -47,7 +47,19 @@ export class InMemoryUserRepository implements UserRepository {
       (item) => item.companyId.toString() === companyId,
     )
 
-    if (!users) {
+    if (users.length === 0) {
+      return null
+    }
+
+    return users
+  }
+
+  async fetchUsersByCompanyId(companyId: string, page: number) {
+    const users = this.items
+      .filter((item) => item.companyId.toString() === companyId)
+      .slice((page - 1) * 20, page * 20)
+
+    if (users.length === 0) {
       return null
     }
 

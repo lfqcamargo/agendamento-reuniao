@@ -25,7 +25,7 @@ describe('DeleteUserUseCase', () => {
     await inMemoryUserRepository.create(userToDelete)
 
     const result = await sut.execute({
-      adminId: adminUser.id.toString(),
+      userAuthenticateId: adminUser.id.toString(),
       id: userToDelete.id.toString(),
     })
 
@@ -36,7 +36,7 @@ describe('DeleteUserUseCase', () => {
 
   it('should not delete a user if admin does not exist', async () => {
     const result = await sut.execute({
-      adminId: 'non-existent-admin',
+      userAuthenticateId: 'non-existent-admin',
       id: 'non-existent-user',
     })
 
@@ -52,7 +52,7 @@ describe('DeleteUserUseCase', () => {
     await inMemoryUserRepository.create(userToDelete)
 
     const result = await sut.execute({
-      adminId: nonAdminUser.id.toString(),
+      userAuthenticateId: nonAdminUser.id.toString(),
       id: userToDelete.id.toString(),
     })
 
@@ -66,7 +66,7 @@ describe('DeleteUserUseCase', () => {
     await inMemoryUserRepository.create(adminUser)
 
     const result = await sut.execute({
-      adminId: adminUser.id.toString(),
+      userAuthenticateId: adminUser.id.toString(),
       id: 'non-existent-user',
     })
 
@@ -80,7 +80,7 @@ describe('DeleteUserUseCase', () => {
     await inMemoryUserRepository.create(adminUser)
 
     const result = await sut.execute({
-      adminId: adminUser.id.toString(),
+      userAuthenticateId: adminUser.id.toString(),
       id: adminUser.id.toString(),
     })
 
@@ -96,7 +96,7 @@ describe('DeleteUserUseCase', () => {
     await inMemoryUserRepository.create(userToDelete)
 
     const result = await sut.execute({
-      adminId: adminUser.id.toString(),
+      userAuthenticateId: adminUser.id.toString(),
       id: userToDelete.id.toString(),
     })
 

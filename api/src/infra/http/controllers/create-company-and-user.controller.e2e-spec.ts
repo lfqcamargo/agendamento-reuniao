@@ -28,7 +28,7 @@ describe('Create Company and User (E2E)', () => {
         cnpj: '12345678000190',
         companyName: 'Lfqcamargo',
         email: 'lfqcamargo@example.com.br',
-        name: 'Lucas Camargo',
+        userName: 'Lucas Camargo',
         nickname: 'lfqcamargo',
         password: '123456789D',
       })
