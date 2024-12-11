@@ -17,6 +17,7 @@ import { z } from 'zod'
 
 import { CreateUserUseCase } from '@/domain/users/application/use-cases/create-user'
 import { AlreadyExistsEmailError } from '@/domain/users/application/use-cases/errors/already-exists-email-error'
+import { AlreadyExistsNicknameError } from '@/domain/users/application/use-cases/errors/already-exists-nickname-error'
 import { InvalidRoleError } from '@/domain/users/application/use-cases/errors/invalid-role-error'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
@@ -96,6 +97,8 @@ export class CreateUserController {
 
       switch (error.constructor) {
         case AlreadyExistsEmailError:
+          throw new ConflictException(error.message)
+        case AlreadyExistsNicknameError:
           throw new ConflictException(error.message)
         case InvalidRoleError:
           throw new BadRequestException(error.message)

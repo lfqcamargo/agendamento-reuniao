@@ -22,6 +22,5 @@ export async function createUser({
     password,
     role,
   })
-
-  console.log(result)
+  return result
 }

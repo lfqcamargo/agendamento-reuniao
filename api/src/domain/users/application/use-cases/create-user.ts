@@ -21,7 +21,7 @@ interface CreateUserUseCaseRequest {
 }
 
 type CreateUserUseCaseResponse = Either<
-  AlreadyExistsEmailError | ResourceNotFoundError,
+  AlreadyExistsEmailError | ResourceNotFoundError | AlreadyExistsNicknameError,
   null
 >
 

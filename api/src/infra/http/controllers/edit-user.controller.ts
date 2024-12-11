@@ -31,9 +31,9 @@ import { EditUserSchemaDto } from './dtos/edit-user.dto'
 
 const editUserSchema = z.object({
   id: z.string().uuid(),
-  name: z.string().min(4).max(50).optional(),
-  nickname: z.string().min(4).max(20).optional(),
-  password: z.string().min(6).max(20).optional(),
+  name: z.string().max(50).optional(),
+  nickname: z.string().max(20).optional(),
+  password: z.string().max(20).optional(),
   role: z.number().optional(),
   active: z.boolean().optional(),
 })

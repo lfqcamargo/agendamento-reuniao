@@ -1,11 +1,11 @@
 import {
   BadRequestException,
-  Body,
   Controller,
   Delete,
   ForbiddenException,
   HttpCode,
   NotFoundException,
+  Param,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -33,7 +33,7 @@ const deleteUserSchema = z.object({
 
 type DeleteUserSchema = z.infer<typeof deleteUserSchema>
 
-@Controller('/users')
+@Controller('/users/:id')
 @ApiTags('users')
 @ApiBearerAuth()
 export class DeleteUserController {
@@ -103,11 +103,11 @@ export class DeleteUserController {
     },
   })
   async handle(
-    @Body(new ZodValidationPipe(deleteUserSchema))
-    body: DeleteUserSchema,
+    @Param(new ZodValidationPipe(deleteUserSchema))
+    param: DeleteUserSchema,
     @CurrentUser() user: UserPayload,
   ) {
-    const { id } = body
+    const { id } = param
     const userAuthenticateId = user.sub
 
     const result = await this.deleteUserUseCase.execute({

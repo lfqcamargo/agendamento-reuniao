@@ -26,7 +26,7 @@ const items = [
   },
   {
     title: 'Salas',
-    url: '#',
+    url: '/rooms',
     icon: Search,
   },
   {

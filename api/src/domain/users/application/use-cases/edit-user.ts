@@ -81,7 +81,10 @@ export class EditUserUseCase {
         nickname,
       )
 
-      if (alreadynickname) {
+      if (
+        alreadynickname &&
+        alreadynickname.id.toString() !== user.id.toString()
+      ) {
         return left(new AlreadyExistsNicknameError())
       }
 

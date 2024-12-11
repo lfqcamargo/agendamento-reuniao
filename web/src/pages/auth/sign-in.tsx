@@ -6,10 +6,9 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { signIn } from '@/api/sign-in'
+import { GenericForm } from '@/components/generic-form'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 
 const signInFormSchema = z.object({
   email: z.string().email(),
@@ -17,6 +16,8 @@ const signInFormSchema = z.object({
 })
 
 type SignInForm = z.infer<typeof signInFormSchema>
+
+const fields = ['email', 'password']
 
 export function SignIn() {
   const [searchParams] = useSearchParams()
@@ -29,7 +30,8 @@ export function SignIn() {
     register,
     handleSubmit,
     watch,
-    formState: { isSubmitting, isValid },
+    control,
+    formState: { errors, isSubmitting, isValid },
   } = useForm<SignInForm>({
     resolver: zodResolver(signInFormSchema),
     mode: 'onChange',
@@ -50,7 +52,6 @@ export function SignIn() {
         toast.success('Login realizado com sucesso!')
       }
     } catch (error) {
-      console.log(error)
       toast.error('Credenciais Inválidas!')
     }
   }
@@ -63,28 +64,12 @@ export function SignIn() {
         <div className="p-4">
           <form onSubmit={handleSubmit(handleSignIn)}>
             <div className="flex flex-col items-center gap-6 w-full">
-              <div className="flex flex-col w-full">
-                <Label className="p-2" htmlFor="email">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  placeholder="Digite seu email..."
-                  {...register('email')}
-                />
-              </div>
-
-              <div className="flex flex-col w-full">
-                <Label className="p-2" htmlFor="password">
-                  Senha
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Digite sua senha..."
-                  {...register('password')}
-                />
-              </div>
+              <GenericForm
+                fields={fields}
+                register={register}
+                errors={errors}
+                control={control}
+              />
 
               <div className="flex w-full flex-col">
                 <Button disabled={isSubmitting || !isValid}>Acessar</Button>

@@ -32,12 +32,12 @@ export class InMemoryRoomRepository implements RoomRepository {
     return room
   }
 
-  async fetchByCompany(companyId: string) {
-    const rooms = this.items.filter(
-      (item) => item.companyId.toString() === companyId,
-    )
+  async fetchByCompany(companyId: string, page: number) {
+    const rooms = this.items
+      .filter((item) => item.companyId.toString() === companyId)
+      .slice((page - 1) * 20, page * 20)
 
-    if (!rooms) {
+    if (rooms.length === 0) {
       return null
     }
 
