@@ -19,7 +19,10 @@ model Company {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
 
-  users User[]
+  users              User[]
+  room               Room[]
+  roomScheduling     RoomScheduling[]
+  meetingParticipant MeetingParticipant[]
 
   @@map("companies")
 }
@@ -29,14 +32,55 @@ model User {
   companyId String    @map("company_id")
   email     String    @unique
   name      String
-  nickname  String    @map("nick_name")
+  nickname  String    @map("nickname")
   password  String
   role      Int
   active    Boolean
   createdAt DateTime  @default(now()) @map("created_at")
   lastLogin DateTime? @map("last_login")
 
-  company Company @relation(fields: [companyId], references: [id])
+  company            Company              @relation(fields: [companyId], references: [id])
+  roomScheduling     RoomScheduling[]
+  meetingParticipant MeetingParticipant[]
 
   @@map("users")
+}
+
+model Room {
+  id        String  @id @default(uuid())
+  companyId String  @map("company_id")
+  name      String
+  active    Boolean
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("rooms")
+}
+
+model RoomScheduling {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  creatorId String
+  roomId    String
+  startTime DateTime
+  endTime   DateTime
+
+  company            Company              @relation(fields: [companyId], references: [id])
+  creator            User                 @relation(fields: [creatorId], references: [id])
+  meetingParticipant MeetingParticipant[]
+
+  @@map("room_scheduling")
+}
+
+model MeetingParticipant {
+  id               String @id @default(uuid())
+  companyId        String @map("company_id")
+  participantId    String @map("participant_id")
+  roomSchedulingId String @map("room_schedules_id")
+
+  company        Company        @relation(fields: [companyId], references: [id])
+  participant    User           @relation(fields: [participantId], references: [id])
+  roomScheduling RoomScheduling @relation(fields: [roomSchedulingId], references: [id])
+
+  @@map("meeting_participants")
 }

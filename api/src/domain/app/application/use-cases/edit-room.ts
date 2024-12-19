@@ -12,8 +12,8 @@ import { RoomRepository } from '../repositories/room-repository'
 interface EditRoomUseCaseRequest {
   userId: string
   roomId: string
-  name: string
-  active: boolean
+  name?: string
+  active?: boolean
 }
 
 type EditRoomUseCaseResponse = Either<

@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
+import { Injectable } from '@nestjs/common'
 
-// import { Injectable } from '@nestjs/common'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Room, RoomProps } from '@/domain/app/enterprise/entities/room'
-// import { PrismaRoomMapper } from '@/infra/database/prisma/mappers/prisma-room-mapper'
-// import { PrismaService } from '@/infra/database/prisma/prisma-service'
+import { PrismaRoomMapper } from '@/infra/database/prisma/mappers/prisma-room-mapper'
+import { PrismaService } from '@/infra/database/prisma/prisma-service'
 
 export function makeRoom(
   override: Partial<RoomProps> = {},
@@ -23,17 +23,17 @@ export function makeRoom(
   return room
 }
 
-// @Injectable()
-// export class RoomFactory {
-//   constructor(private prisma: PrismaService) {}
+@Injectable()
+export class RoomFactory {
+  constructor(private prisma: PrismaService) {}
 
-//   async makePrismaRoom(data: Partial<RoomProps> = {}): Promise<Room> {
-//     const room = makeRoom(data)
+  async makePrismaRoom(data: Partial<RoomProps> = {}): Promise<Room> {
+    const room = makeRoom(data)
 
-//     await this.prisma.room.create({
-//       data: PrismaRoomMapper.toPrisma(room),
-//     })
+    await this.prisma.room.create({
+      data: PrismaRoomMapper.toPrisma(room),
+    })
 
-//     return room
-//   }
-// }
+    return room
+  }
+}
