@@ -18,13 +18,14 @@ import { z } from 'zod'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { SystemDoesNotAllowError } from '@/core/errors/system-does-not-allow'
 import { DeleteParticipantUseCase } from '@/domain/app/application/use-cases/delete-participant'
+import { CurrentUser } from '@/infra/auth/current-user.decorator'
+import { UserPayload } from '@/infra/auth/jwt.strategy'
 
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
 
-const deleteParticipantSchema = z.object({
-  userAuthenticateId: z.string().uuid(),
-  meetingParticipantId: z.string().uuid(),
-})
+const participantQueryParamSchema = z.object({ id: z.string().uuid() })
+
+type QueryValidationPipe = z.infer<typeof participantQueryParamSchema>
 
 @Controller('/meetings')
 @ApiTags('meetings')
@@ -32,7 +33,7 @@ const deleteParticipantSchema = z.object({
 export class DeleteParticipantController {
   constructor(private deleteParticipant: DeleteParticipantUseCase) {}
 
-  @Delete('/participants/:meetingParticipantId')
+  @Delete('/participants/:id')
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete a participant from a meeting.' })
   @ApiParam({
@@ -54,20 +55,17 @@ export class DeleteParticipantController {
     description: 'User is not authorized to delete this participant.',
   })
   async handle(
-    @Param(
-      'meetingParticipantId',
-      new ZodValidationPipe(deleteParticipantSchema),
-    )
-    param: { meetingParticipantId: string },
-    @Param('userAuthenticateId', new ZodValidationPipe(deleteParticipantSchema))
-    paramAuth: { userAuthenticateId: string },
+    @CurrentUser()
+    user: UserPayload,
+    @Param(new ZodValidationPipe(participantQueryParamSchema))
+    params: QueryValidationPipe,
   ) {
-    const { meetingParticipantId } = param
-    const { userAuthenticateId } = paramAuth
+    const userId = user.sub
+    const { id } = params
 
     const result = await this.deleteParticipant.execute({
-      userAuthenticateId,
-      meetingParticipantId,
+      userAuthenticateId: userId,
+      meetingParticipantId: id,
     })
 
     if (result.isLeft()) {

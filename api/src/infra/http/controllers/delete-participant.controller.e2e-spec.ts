@@ -1,4 +1,5 @@
 import { INestApplication } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { CompanyFactory } from 'test/factories/make-company'
@@ -14,6 +15,8 @@ import { PrismaService } from '@/infra/database/prisma/prisma-service'
 describe('Delete Participant (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
+  let jwt: JwtService
+
   let companyFactory: CompanyFactory
   let userFactory: UserFactory
   let roomFactory: RoomFactory
@@ -34,6 +37,8 @@ describe('Delete Participant (E2E)', () => {
 
     app = moduleRef.createNestApplication()
     prisma = moduleRef.get(PrismaService)
+    jwt = moduleRef.get(JwtService)
+
     companyFactory = moduleRef.get(CompanyFactory)
     userFactory = moduleRef.get(UserFactory)
     roomFactory = moduleRef.get(RoomFactory)
@@ -64,10 +69,13 @@ describe('Delete Participant (E2E)', () => {
         roomSchedulingId: roomScheduling.id,
       })
 
+    const accessToken = jwt.sign({ sub: user.id.toString() })
+
     const response = await request(app.getHttpServer())
       .delete(`/meetings/participants/${meetingParticipant.id.toString()}`)
-      .send({ userAuthenticateId: user.id.toString() })
+      .set('Authorization', `Bearer ${accessToken}`)
 
+    console.log(response.body.errors)
     expect(response.statusCode).toBe(204)
 
     const deletedParticipant = await prisma.meetingParticipant.findUnique({
@@ -77,9 +85,5 @@ describe('Delete Participant (E2E)', () => {
     })
 
     expect(deletedParticipant).toBeNull()
-  })
-
-  afterAll(async () => {
-    await app.close()
   })
 })

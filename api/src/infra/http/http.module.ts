@@ -4,7 +4,7 @@ import { AddParticipantUseCase } from '@/domain/app/application/use-cases/add-pa
 import { CreateMeetingUseCase } from '@/domain/app/application/use-cases/create-meeting'
 import { CreateRoomUseCase } from '@/domain/app/application/use-cases/create-room'
 import { DeleteMeetingUseCase } from '@/domain/app/application/use-cases/delete-meeting'
-// import { DeleteParticipantUseCase } from '@/domain/app/application/use-cases/delete-participant'
+import { DeleteParticipantUseCase } from '@/domain/app/application/use-cases/delete-participant'
 import { DeleteRoomUseCase } from '@/domain/app/application/use-cases/delete-room'
 import { EditRoomUseCase } from '@/domain/app/application/use-cases/edit-room'
 import { FetchRoomsByCompanyIdUseCase } from '@/domain/app/application/use-cases/fetch-rooms-by-company-id'
@@ -27,7 +27,7 @@ import { CreateMeetingController } from './controllers/create-meeting.controller
 import { CreateRoomController } from './controllers/create-room.controller'
 import { CreateUserController } from './controllers/create-user.controller'
 import { DeleteMeetingController } from './controllers/delete-meeting.controller'
-// import { DeleteParticipantController } from './controllers/delete-participant.controller'
+import { DeleteParticipantController } from './controllers/delete-participant.controller'
 import { DeleteRoomController } from './controllers/delete-room.controller'
 import { DeleteUserController } from './controllers/delete-user.controller'
 import { EditRoomController } from './controllers/edit-room.controller'
@@ -57,7 +57,7 @@ import { GetProfileController } from './controllers/get-profile.controller'
     CreateMeetingController,
     DeleteMeetingController,
     AddParticipantController,
-    // DeleteParticipantController,
+    DeleteParticipantController,
   ],
   providers: [
     AuthenticateUserUseCase,
@@ -76,7 +76,7 @@ import { GetProfileController } from './controllers/get-profile.controller'
     CreateMeetingUseCase,
     DeleteMeetingUseCase,
     AddParticipantUseCase,
-    // DeleteParticipantUseCase,
+    DeleteParticipantUseCase,
   ],
 })
 export class HttpModule {}
