@@ -4,11 +4,11 @@ import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { User } from '../../enterprise/entities/user'
-import { UserRepository } from '../repositories/user-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface FindUserByIdUseCaseRequest {
-  userAuthenticateId: string
-  id: string
+  companyId: string
+  userId: string
 }
 
 type FindUserByIdUseCaseResponse = Either<
@@ -20,30 +20,20 @@ type FindUserByIdUseCaseResponse = Either<
 
 @Injectable()
 export class FindUserByIdUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async execute({
-    userAuthenticateId,
-    id,
+    companyId,
+    userId,
   }: FindUserByIdUseCaseRequest): Promise<FindUserByIdUseCaseResponse> {
-    const user = await this.userRepository.findById(userAuthenticateId)
+    const user = await this.usersRepository.findById(companyId, userId)
 
     if (!user) {
       return left(new ResourceNotFoundError('User not found.'))
     }
 
-    const findUser = await this.userRepository.findById(id)
-
-    if (!findUser) {
-      return left(new ResourceNotFoundError('User not found.'))
-    }
-
-    if (user.companyId.toString() !== findUser.companyId.toString()) {
-      return left(new ResourceNotFoundError('User not found.'))
-    }
-
     return right({
-      user: findUser,
+      user,
     })
   }
 }

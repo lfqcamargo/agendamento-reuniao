@@ -43,13 +43,14 @@ describe('Edit User (E2E)', () => {
     })
     const accessToken = jwt.sign({
       sub: user.id.toString(),
+      company: user.companyId.toString(),
     })
 
     const response = await request(app.getHttpServer())
-      .put('/users')
+      .put(`/users/${userToEdit.id.toString()}`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        id: userToEdit.id.toString(),
+      .attach('profilePhoto', './test/e2e/sample-upload.png')
+      .field({
         name: 'Lucas Camargo',
         nickname: 'lfqcamargo',
         password: '123456789lfqcamargo',
@@ -57,7 +58,7 @@ describe('Edit User (E2E)', () => {
         active: true,
       })
 
-    expect(response.statusCode).toBe(200)
+    expect(response.statusCode).toBe(204)
 
     const updatedUser = await prisma.user.findUnique({
       where: {

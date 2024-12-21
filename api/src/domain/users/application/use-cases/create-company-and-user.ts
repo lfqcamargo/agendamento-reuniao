@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common'
 
 import { Either, left, right } from '@/core/either'
-import { CompanyRepository } from '@/domain/users/application/repositories/company-repository'
+import { AlreadyExistsError } from '@/core/errors/already-exists-error'
+import { CompaniesRepository } from '@/domain/users/application/repositories/companies-repository'
 
 import { Company } from '../../enterprise/entities/company'
 import { User } from '../../enterprise/entities/user'
 import { HashGenerator } from '../cryptography/hash-generator'
-import { UserRepository } from '../repositories/user-repository'
-import { AlreadyExistsCnpjError } from './errors/already-exists-cnpj-error'
-import { AlreadyExistsEmailError } from './errors/already-exists-email-error'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface CreateCompanyRequest {
   cnpj: string
@@ -24,16 +23,13 @@ interface CreateUserRequest {
 
 type CreateCompanyAndUserRequest = CreateCompanyRequest & CreateUserRequest
 
-type CreateCompanyAndUserUseCaseResponse = Either<
-  AlreadyExistsCnpjError | AlreadyExistsEmailError,
-  null
->
+type CreateCompanyAndUserUseCaseResponse = Either<AlreadyExistsError, null>
 
 @Injectable()
 export class CreateCompanyAndUserUseCase {
   constructor(
-    private companyRepository: CompanyRepository,
-    private userRepository: UserRepository,
+    private companiesRepository: CompaniesRepository,
+    private usersRepository: UsersRepository,
     private hashGenerator: HashGenerator,
   ) {}
 
@@ -45,16 +41,16 @@ export class CreateCompanyAndUserUseCase {
     nickname,
     password,
   }: CreateCompanyAndUserRequest): Promise<CreateCompanyAndUserUseCaseResponse> {
-    const alreadyCnpj = await this.companyRepository.findByCnpj(cnpj)
+    const alreadyCnpj = await this.companiesRepository.findByCnpj(cnpj)
 
     if (alreadyCnpj) {
-      return left(new AlreadyExistsCnpjError())
+      return left(new AlreadyExistsError('Already exists cnpj'))
     }
 
-    const alreadyEmail = await this.userRepository.findByEmail(email)
+    const alreadyEmail = await this.usersRepository.findByEmail(email)
 
     if (alreadyEmail) {
-      return left(new AlreadyExistsEmailError())
+      return left(new AlreadyExistsError('Already exists email'))
     }
 
     const company = Company.create({
@@ -74,8 +70,9 @@ export class CreateCompanyAndUserUseCase {
       active: true,
     })
 
-    await this.companyRepository.create(company)
-    await this.userRepository.create(user)
+    company.users.push(user)
+
+    await this.companiesRepository.create(company)
 
     return right(null)
   }

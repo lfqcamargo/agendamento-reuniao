@@ -4,27 +4,27 @@ import { PrismaClient } from '@prisma/client'
 import { MeetingParticipantsRepository } from '@/domain/app/application/repositories/meeting-participants-repository'
 import { RoomRepository } from '@/domain/app/application/repositories/room-repository'
 import { RoomSchedulingRepository } from '@/domain/app/application/repositories/room-scheduling-repository'
-import { CompanyRepository } from '@/domain/users/application/repositories/company-repository'
-import { UserRepository } from '@/domain/users/application/repositories/user-repository'
+import { CompaniesRepository } from '@/domain/users/application/repositories/companies-repository'
+import { UsersRepository } from '@/domain/users/application/repositories/users-repository'
 
 import { PrismaService } from './prisma/prisma-service'
-import { PrismaCompanyRepository } from './prisma/repositories/prisma-company-repository'
+import { PrismaCompaniesRepository } from './prisma/repositories/prisma-companies-repository'
 import { PrismaMeetingParticipantsRepository } from './prisma/repositories/prisma-meeting-participants'
 import { PrismaRoomRepository } from './prisma/repositories/prisma-room-repository'
 import { PrismaRoomSchedulingRepository } from './prisma/repositories/prisma-room-scheduling-repository'
-import { PrismaUserRepository } from './prisma/repositories/prisma-user-repository'
+import { PrismaUsersRepository } from './prisma/repositories/prisma-users-repository'
 
 @Module({
   providers: [
     PrismaService,
     PrismaClient,
     {
-      provide: CompanyRepository,
-      useClass: PrismaCompanyRepository,
+      provide: CompaniesRepository,
+      useClass: PrismaCompaniesRepository,
     },
     {
-      provide: UserRepository,
-      useClass: PrismaUserRepository,
+      provide: UsersRepository,
+      useClass: PrismaUsersRepository,
     },
     {
       provide: RoomRepository,
@@ -42,8 +42,8 @@ import { PrismaUserRepository } from './prisma/repositories/prisma-user-reposito
   exports: [
     PrismaService,
     PrismaClient,
-    CompanyRepository,
-    UserRepository,
+    CompaniesRepository,
+    UsersRepository,
     RoomRepository,
     RoomSchedulingRepository,
     MeetingParticipantsRepository,

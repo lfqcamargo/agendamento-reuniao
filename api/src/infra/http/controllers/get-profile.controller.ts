@@ -5,12 +5,6 @@ import {
   HttpCode,
   NotFoundException,
 } from '@nestjs/common'
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { GetProfileUseCase } from '@/domain/users/application/use-cases/get-profile'
@@ -18,67 +12,20 @@ import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { UserPresenter } from '@/infra/database/prisma/presenters/user-presenter'
 
+import { GetProfileDocs } from './dtos/get-profile.dto'
+
 @Controller('/me')
-@ApiTags('users')
-@ApiBearerAuth()
 export class GetProfileController {
   constructor(private getProfileUseCase: GetProfileUseCase) {}
 
   @Get()
   @HttpCode(200)
-  @ApiOperation({ summary: 'Find a profile user authenticated.' })
-  @ApiResponse({
-    status: 200,
-    description: 'User found successfully.',
-    content: {
-      'application/json': {
-        examples: {
-          userFound: {
-            summary: 'User found',
-            value: {
-              id: 'ba397f8f-487e-4bdc-9b7d-b397bb246e47',
-              name: 'Lucas Camargo',
-              email: 'lfqcamargo@gmail.com',
-              role: 1,
-              active: true,
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found - The requested user does not exist.',
-    content: {
-      'application/json': {
-        examples: {
-          userNotFound: {
-            summary: 'User not found',
-            value: { message: 'User not found.' },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - Invalid or missing authentication.',
-    content: {
-      'application/json': {
-        examples: {
-          unauthorized: {
-            summary: 'Unauthorized',
-            value: { message: 'Unauthorized.' },
-          },
-        },
-      },
-    },
-  })
+  @GetProfileDocs()
   async handle(@CurrentUser() user: UserPayload) {
-    const userAuthenticateId = user.sub
+    const { company: companyId, sub: userAuthenticateId } = user
 
     const result = await this.getProfileUseCase.execute({
+      companyId,
       userAuthenticateId,
     })
 

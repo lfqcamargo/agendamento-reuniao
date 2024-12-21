@@ -7,112 +7,43 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger'
 import { z } from 'zod'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { SystemDoesNotAllowError } from '@/core/errors/system-does-not-allow'
-import { UserNotAdminError } from '@/core/errors/user-not-admin'
-import { UserNotCompanyError } from '@/core/errors/user-not-company'
+import { UserNotAdminError } from '@/core/errors/user-not-admin-error'
 import { DeleteUserUseCase } from '@/domain/users/application/use-cases/delete-user'
 import { CurrentUser } from '@/infra/auth/current-user.decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
 
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
-import { DeleteUserSchemaDto } from './dtos/delete-user.dto'
+import { DeleteUserDocs } from './dtos/delete-user.dto'
 
-const deleteUserSchema = z.object({
-  id: z.string().uuid(),
+const deleteUserParam = z.object({
+  userId: z.string().uuid(),
 })
 
-type DeleteUserSchema = z.infer<typeof deleteUserSchema>
+type DeleteUserParam = z.infer<typeof deleteUserParam>
 
-@Controller('/users/:id')
-@ApiTags('users')
-@ApiBearerAuth()
+@Controller('/users')
 export class DeleteUserController {
   constructor(private deleteUserUseCase: DeleteUserUseCase) {}
 
-  @Delete()
+  @Delete(':userId')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Delete an existing user in the company.' })
-  @ApiBody({ type: DeleteUserSchemaDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User deleteed successfully.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found - The requested user does not exist.',
-    content: {
-      'application/json': {
-        examples: {
-          userNotFound: {
-            summary: 'User not found',
-            value: { message: 'User not found.' },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Operation not allowed by the system or user.',
-    content: {
-      'application/json': {
-        examples: {
-          systemNotAllow: {
-            summary: 'System Does Not Allow',
-            value: {
-              message:
-                'The system does not allow this operation at the moment.',
-            },
-          },
-          userNotCompany: {
-            summary: 'User Not Associated with Company',
-            value: {
-              message: 'User is not associated with the company.',
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request - Validation errors or user is not an admin.',
-    content: {
-      'application/json': {
-        examples: {
-          validationError: {
-            summary: 'Validation Error',
-            value: { message: 'Invalid input data.' },
-          },
-          userNotAdmin: {
-            summary: 'User Not Admin',
-            value: { message: 'User is not an admin and cannot delete users.' },
-          },
-        },
-      },
-    },
-  })
+  @DeleteUserDocs()
   async handle(
-    @Param(new ZodValidationPipe(deleteUserSchema))
-    param: DeleteUserSchema,
+    @Param(new ZodValidationPipe(deleteUserParam))
+    params: DeleteUserParam,
     @CurrentUser() user: UserPayload,
   ) {
-    const { id } = param
-    const userAuthenticateId = user.sub
+    const { company: companyId, sub: userAuthenticateId } = user
+    const { userId } = params
 
     const result = await this.deleteUserUseCase.execute({
+      companyId,
       userAuthenticateId,
-      id,
+      userId,
     })
 
     if (result.isLeft()) {
@@ -122,10 +53,8 @@ export class DeleteUserController {
         case ResourceNotFoundError:
           throw new NotFoundException(error.message)
         case UserNotAdminError:
-          throw new BadRequestException(error.message)
-        case SystemDoesNotAllowError:
           throw new ForbiddenException(error.message)
-        case UserNotCompanyError:
+        case SystemDoesNotAllowError:
           throw new ForbiddenException(error.message)
         default:
           throw new BadRequestException(error.message)

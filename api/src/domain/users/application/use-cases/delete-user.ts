@@ -3,57 +3,54 @@ import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { SystemDoesNotAllowError } from '@/core/errors/system-does-not-allow'
-import { UserNotAdminError } from '@/core/errors/user-not-admin'
-import { UserNotCompanyError } from '@/core/errors/user-not-company'
+import { UserNotAdminError } from '@/core/errors/user-not-admin-error'
 
-import { UserRepository } from '../repositories/user-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface DeleteUserUseCaseRequest {
+  companyId: string
   userAuthenticateId: string
-  id: string
+  userId: string
 }
 
 type DeleteUserUseCaseResponse = Either<
-  | ResourceNotFoundError
-  | UserNotAdminError
-  | SystemDoesNotAllowError
-  | UserNotCompanyError,
+  ResourceNotFoundError | SystemDoesNotAllowError | UserNotAdminError,
   null
 >
 
 @Injectable()
 export class DeleteUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async execute({
+    companyId,
     userAuthenticateId,
-    id,
+    userId,
   }: DeleteUserUseCaseRequest): Promise<DeleteUserUseCaseResponse> {
-    const userAdmin = await this.userRepository.findById(userAuthenticateId)
+    const userAuthenticate = await this.usersRepository.findById(
+      companyId,
+      userAuthenticateId,
+    )
 
-    if (!userAdmin) {
-      return left(new ResourceNotFoundError('User not found.'))
+    if (!userAuthenticate) {
+      return left(new ResourceNotFoundError('User admin not found.'))
     }
 
-    if (userAdmin.role !== 1) {
+    if (!userAuthenticate.isAdmin()) {
       return left(new UserNotAdminError())
     }
 
-    const user = await this.userRepository.findById(id)
+    const user = await this.usersRepository.findById(companyId, userId)
 
     if (!user) {
       return left(new ResourceNotFoundError('User not found.'))
     }
 
-    if (user.id.toString() === userAdmin.id.toString()) {
-      return left(new SystemDoesNotAllowError())
+    if (user.id.toString() === userAuthenticate.id.toString()) {
+      return left(new SystemDoesNotAllowError('Deleting is not allowed'))
     }
 
-    if (user.companyId.toString() !== userAdmin.companyId.toString()) {
-      return left(new UserNotCompanyError())
-    }
-
-    await this.userRepository.delete(user)
+    await this.usersRepository.delete(user)
 
     return right(null)
   }

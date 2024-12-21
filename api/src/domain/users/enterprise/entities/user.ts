@@ -2,14 +2,20 @@ import { Entity } from '@/core/entities/entity'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Optional } from '@/core/types/optional'
 
+export enum UserRole {
+  Admin = 1,
+  Member = 2,
+}
+
 export interface UserProps {
   companyId: UniqueEntityID
   email: string
   name: string
   nickname: string
   password: string
-  role: number
+  role: UserRole
   active: boolean
+  profilePhoto?: Buffer | null
   createdAt: Date
   lastLogin?: Date | null
 }
@@ -43,6 +49,13 @@ export class User extends Entity<UserProps> {
     return this.props.active
   }
 
+  get profilePhoto() {
+    if (this.props.profilePhoto) {
+      return this.props.profilePhoto
+    }
+    return null
+  }
+
   get createdAt() {
     return this.props.createdAt
   }
@@ -63,12 +76,20 @@ export class User extends Entity<UserProps> {
     this.props.password = password
   }
 
-  set role(role: number) {
+  set role(role: UserRole) {
     this.props.role = role
   }
 
   set active(active: boolean) {
     this.props.active = active
+  }
+
+  set profilePhoto(profilePhoto: Buffer | null) {
+    this.props.profilePhoto = profilePhoto
+  }
+
+  isAdmin() {
+    return this.role === UserRole.Admin
   }
 
   static create(props: Optional<UserProps, 'createdAt'>, id?: UniqueEntityID) {

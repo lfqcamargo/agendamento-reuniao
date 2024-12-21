@@ -1,30 +1,31 @@
 import { Injectable } from '@nestjs/common'
 
 import { Either, left, right } from '@/core/either'
+import { AlreadyExistsError } from '@/core/errors/already-exists-error'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { SystemDoesNotAllowError } from '@/core/errors/system-does-not-allow'
+import { UserNotAdminError } from '@/core/errors/user-not-admin-error'
 
+import { UserRole } from '../../enterprise/entities/user'
 import { HashGenerator } from '../cryptography/hash-generator'
-import { UserRepository } from '../repositories/user-repository'
-import { AlreadyExistsNicknameError } from './errors/already-exists-nickname-error'
-import { InvalidRoleError } from './errors/invalid-role-error'
-import { MissingAdminError } from './errors/missing-admin'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface EditUserUseCaseRequest {
+  companyId: string
   userAuthenticateId: string
-  id: string
+  userId: string
   name?: string
   nickname?: string
   password?: string
-  role?: number
+  role?: UserRole
   active?: boolean
+  profilePhoto?: Buffer | null
 }
 
 type EditUserUseCaseResponse = Either<
   | ResourceNotFoundError
-  | AlreadyExistsNicknameError
-  | InvalidRoleError
-  | MissingAdminError
+  | AlreadyExistsError
+  | UserNotAdminError
   | SystemDoesNotAllowError,
   null
 >
@@ -32,94 +33,102 @@ type EditUserUseCaseResponse = Either<
 @Injectable()
 export class EditUserUseCase {
   constructor(
-    private userRepository: UserRepository,
+    private usersRepository: UsersRepository,
     private hashGenerator: HashGenerator,
   ) {}
 
   async execute({
+    companyId,
     userAuthenticateId,
-    id,
+    userId,
     name,
     nickname,
     password,
     role,
     active,
+    profilePhoto,
   }: EditUserUseCaseRequest): Promise<EditUserUseCaseResponse> {
-    const validRoles = [1, 2] // Admin (1), User (2)
+    const userAuthenticate = await this.usersRepository.findById(
+      companyId,
+      userAuthenticateId,
+    )
 
-    const userAuthenticate =
-      await this.userRepository.findById(userAuthenticateId)
-
-    const user = await this.userRepository.findById(id)
+    const userEdit = await this.usersRepository.findById(companyId, userId)
 
     if (!userAuthenticate) {
       return left(new ResourceNotFoundError('User authenticate not found.'))
     }
 
-    if (!user) {
-      return left(new ResourceNotFoundError('User not found.'))
-    }
-
-    if (userAuthenticate.companyId.toString() !== user.companyId.toString()) {
-      return left(new SystemDoesNotAllowError())
+    if (!userEdit) {
+      return left(new ResourceNotFoundError('User to edit not found.'))
     }
 
     if (
-      userAuthenticate.id.toString() !== user.id.toString() &&
-      userAuthenticate.role !== 1
+      userAuthenticate.role !== UserRole.Admin &&
+      userAuthenticate.id.toString() !== userEdit.id.toString()
     ) {
-      return left(new SystemDoesNotAllowError())
+      return left(new UserNotAdminError())
     }
 
     if (name) {
-      user.name = name
+      userEdit.name = name
     }
 
     if (nickname) {
-      const alreadynickname = await this.userRepository.findByNickname(
-        user.companyId.toString(),
+      const alreadynickname = await this.usersRepository.findByNickname(
+        companyId,
         nickname,
       )
 
-      if (
-        alreadynickname &&
-        alreadynickname.id.toString() !== user.id.toString()
-      ) {
-        return left(new AlreadyExistsNicknameError())
+      if (alreadynickname) {
+        return left(new AlreadyExistsError('Already exists nickname.'))
       }
 
-      user.nickname = nickname
+      userEdit.nickname = nickname
     }
 
     if (password) {
       const hashedPassword = await this.hashGenerator.hash(password)
 
-      user.password = hashedPassword
+      userEdit.password = hashedPassword
     }
 
     if (role) {
-      if (!validRoles.includes(role)) {
-        return left(new InvalidRoleError())
+      if (!userAuthenticate.isAdmin()) {
+        return left(
+          new SystemDoesNotAllowError('Members cannot change their role'),
+        )
       }
 
-      if (user.role === 1) {
-        const adminUsers = await this.userRepository.fetchAllAdmins(
-          user.companyId.toString(),
-        )
+      if (userEdit.isAdmin() && role !== UserRole.Admin) {
+        const adminUsers = await this.usersRepository.fetchAllAdmins(companyId)
 
         if (!adminUsers || adminUsers.length === 1) {
-          return left(new MissingAdminError())
+          return left(
+            new SystemDoesNotAllowError(
+              'Must contain at least one administrator.',
+            ),
+          )
         }
       }
 
-      user.role = role
+      userEdit.role = role
     }
 
-    if (active) {
-      user.active = active
+    if (active !== undefined) {
+      if (!userAuthenticate.isAdmin()) {
+        return left(
+          new SystemDoesNotAllowError('Members cannot switch from inactivity'),
+        )
+      }
+      userEdit.active = active
     }
 
-    await this.userRepository.save(user)
+    if (profilePhoto !== undefined) {
+      userEdit.profilePhoto = profilePhoto
+    }
+
+    await this.usersRepository.save(userEdit)
 
     return right(null)
   }

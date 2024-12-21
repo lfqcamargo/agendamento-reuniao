@@ -4,7 +4,7 @@ import { Either, left, right } from '@/core/either'
 
 import { Encrypter } from '../cryptography/encrypter'
 import { HashComparer } from '../cryptography/hash-comparer'
-import { UserRepository } from '../repositories/user-repository'
+import { UsersRepository } from '../repositories/users-repository'
 import { WrongCredentialsError } from './errors/wrong-credentials-error'
 
 interface AuthenticateUserUseCaseRequest {
@@ -22,7 +22,7 @@ type AuthenticateUserUseCaseResponse = Either<
 @Injectable()
 export class AuthenticateUserUseCase {
   constructor(
-    private userRepository: UserRepository,
+    private usersRepository: UsersRepository,
     private hashComparer: HashComparer,
     private encrypter: Encrypter,
   ) {}
@@ -31,7 +31,7 @@ export class AuthenticateUserUseCase {
     email,
     password,
   }: AuthenticateUserUseCaseRequest): Promise<AuthenticateUserUseCaseResponse> {
-    const user = await this.userRepository.findByEmail(email)
+    const user = await this.usersRepository.findByEmail(email)
 
     if (!user) {
       return left(new WrongCredentialsError())

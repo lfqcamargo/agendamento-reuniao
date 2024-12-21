@@ -1,22 +1,22 @@
 import { makeUser } from 'test/factories/make-user'
-import { InMemoryUserRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-user-repository'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { FindUserByIdUseCase } from './find-user-by-id'
 
-let inMemoryUserRepository: InMemoryUserRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
 let sut: FindUserByIdUseCase
 
 describe('FindUserByIdUseCase', () => {
   beforeEach(() => {
-    inMemoryUserRepository = new InMemoryUserRepository()
-    sut = new FindUserByIdUseCase(inMemoryUserRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    sut = new FindUserByIdUseCase(inMemoryUsersRepository)
   })
 
   it('should be able to find a user by id', async () => {
     const user = makeUser()
-    await inMemoryUserRepository.create(user)
+    await inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
       userAuthenticateId: user.id.toString(),

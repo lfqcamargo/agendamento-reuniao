@@ -43,23 +43,21 @@ describe('Delete User (E2E)', () => {
     })
     const accessToken = jwt.sign({
       sub: adminUser.id.toString(),
+      company: adminUser.companyId.toString(),
     })
 
     const response = await request(app.getHttpServer())
-      .delete('/users')
+      .delete(`/users/${userToDelete.id.toString()}`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
+
+    expect(response.statusCode).toBe(200)
+
+    const deletedUser = await prisma.user.findUnique({
+      where: {
         id: userToDelete.id.toString(),
-      })
+      },
+    })
 
-    // expect(response.statusCode).toBe(200)
-
-    // const deletedUser = await prisma.user.findUnique({
-    //   where: {
-    //     id: userToDelete.id.toString(),
-    //   },
-    // })
-
-    // expect(deletedUser).toBeNull()
+    expect(deletedUser).toBeNull()
   })
 })

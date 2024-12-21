@@ -4,9 +4,10 @@ import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { User } from '../../enterprise/entities/user'
-import { UserRepository } from '../repositories/user-repository'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface GetProfileUseCaseRequest {
+  companyId: string
   userAuthenticateId: string
 }
 
@@ -19,12 +20,16 @@ type GetProfileUseCaseResponse = Either<
 
 @Injectable()
 export class GetProfileUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async execute({
+    companyId,
     userAuthenticateId,
   }: GetProfileUseCaseRequest): Promise<GetProfileUseCaseResponse> {
-    const user = await this.userRepository.findById(userAuthenticateId)
+    const user = await this.usersRepository.findById(
+      companyId,
+      userAuthenticateId,
+    )
 
     if (!user) {
       return left(new ResourceNotFoundError('User not found.'))

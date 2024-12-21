@@ -28,16 +28,17 @@ model Company {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  companyId String    @map("company_id")
-  email     String    @unique
-  name      String
-  nickname  String    @map("nickname")
-  password  String
-  role      Int
-  active    Boolean
-  createdAt DateTime  @default(now()) @map("created_at")
-  lastLogin DateTime? @map("last_login")
+  id           String    @id @default(uuid())
+  companyId    String    @map("company_id")
+  email        String    @unique
+  name         String
+  nickname     String    @map("nickname")
+  password     String
+  role         Int
+  active       Boolean
+  profilePhoto Bytes?    @map("profile_photo")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  lastLogin    DateTime? @map("last_login")
 
   company            Company              @relation(fields: [companyId], references: [id])
   roomScheduling     RoomScheduling[]

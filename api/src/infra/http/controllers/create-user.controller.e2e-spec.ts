@@ -9,7 +9,7 @@ import { AppModule } from '@/infra/app.module'
 import { DatabaseModule } from '@/infra/database/database.module'
 import { PrismaService } from '@/infra/database/prisma/prisma-service'
 
-describe('Create User and User (E2E)', () => {
+describe('Create User (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let companyFactory: CompanyFactory
@@ -34,15 +34,18 @@ describe('Create User and User (E2E)', () => {
 
   test('[POST] /users', async () => {
     const company = await companyFactory.makePrismaCompany()
-    const user = await userFactory.makePrismaUser({ companyId: company.id })
-    const acessToken = jwt.sign({
+    const user = await userFactory.makePrismaUser({
+      companyId: company.id,
+      role: 1,
+    })
+    const accessToken = jwt.sign({
       sub: user.id.toString(),
       company: user.companyId.toString(),
     })
 
     const response = await request(app.getHttpServer())
       .post('/users')
-      .set('Authorization', `Bearer ${acessToken}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Lucas Camargo',
         nickname: 'lfqcamargo',

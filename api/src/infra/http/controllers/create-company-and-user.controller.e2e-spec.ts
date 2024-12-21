@@ -25,7 +25,7 @@ describe('Create Company and User (E2E)', () => {
     const response = await request(app.getHttpServer())
       .post('/companies')
       .send({
-        cnpj: '12345678000190',
+        cnpj: '16877866000115',
         companyName: 'Lfqcamargo',
         email: 'lfqcamargo@example.com.br',
         userName: 'Lucas Camargo',
@@ -37,7 +37,7 @@ describe('Create Company and User (E2E)', () => {
 
     const companyOnDatabase = await prisma.company.findUnique({
       where: {
-        cnpj: '12345678000190',
+        cnpj: '16877866000115',
       },
     })
     expect(companyOnDatabase).toBeTruthy()

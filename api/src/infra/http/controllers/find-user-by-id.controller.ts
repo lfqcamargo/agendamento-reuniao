@@ -6,13 +6,6 @@ import {
   NotFoundException,
   Param,
 } from '@nestjs/common'
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger'
 import { z } from 'zod'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
@@ -23,86 +16,29 @@ import { UserPresenter } from '@/infra/database/prisma/presenters/user-presenter
 
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
 
-const findUserByIdSchema = z.object({
-  id: z.string().uuid(),
+const findUserByIdParam = z.object({
+  userId: z.string().uuid(),
 })
 
-type FindUserByIdSchema = z.infer<typeof findUserByIdSchema>
+type FindUserByIdParam = z.infer<typeof findUserByIdParam>
 
-@Controller('/users/:id')
-@ApiTags('users')
-@ApiBearerAuth()
+@Controller('/users')
 export class FindUserByIdController {
   constructor(private findUserByIdUseCase: FindUserByIdUseCase) {}
 
-  @Get()
+  @Get(':userId')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Find a user by their unique ID.' })
-  @ApiParam({
-    name: 'id',
-    type: 'string',
-    description: 'Unique identifier of the user',
-    example: 'ba397f8f-487e-4bdc-9b7d-b397bb246e47',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'User found successfully.',
-    content: {
-      'application/json': {
-        examples: {
-          userFound: {
-            summary: 'User found',
-            value: {
-              id: 'ba397f8f-487e-4bdc-9b7d-b397bb246e47',
-              name: 'Lucas Camargo',
-              email: 'lfqcamargo@gmail.com',
-              role: 1,
-              active: true,
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not Found - The requested user does not exist.',
-    content: {
-      'application/json': {
-        examples: {
-          userNotFound: {
-            summary: 'User not found',
-            value: { message: 'User not found.' },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - Invalid or missing authentication.',
-    content: {
-      'application/json': {
-        examples: {
-          unauthorized: {
-            summary: 'Unauthorized',
-            value: { message: 'Unauthorized.' },
-          },
-        },
-      },
-    },
-  })
   async handle(
-    @Param(new ZodValidationPipe(findUserByIdSchema))
-    params: FindUserByIdSchema,
+    @Param(new ZodValidationPipe(findUserByIdParam))
+    params: FindUserByIdParam,
     @CurrentUser() user: UserPayload,
   ) {
-    const userAuthenticateId = user.sub
-    const { id } = params
+    const companyId = user.company
+    const { userId } = params
 
     const result = await this.findUserByIdUseCase.execute({
-      userAuthenticateId,
-      id,
+      companyId,
+      userId,
     })
 
     if (result.isLeft()) {

@@ -1,13 +1,70 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { applyDecorators } from '@nestjs/common'
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiProperty,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
-export class EditUserSchemaDto {
-  @ApiProperty({
-    example: 'ba397f8f-487e-4bdc-9b7d-b397bb246e47',
-    description: 'User id',
-    type: String,
-  })
-  id!: string
+import { UserRole } from '@/domain/users/enterprise/entities/user'
 
+export const EditUserDocs = () => {
+  return applyDecorators(
+    ApiTags('users'),
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Edit an existing user in the company.' }),
+    ApiParam({
+      name: 'userId',
+      type: 'string',
+      description: 'Unique identifier of the user',
+      example: 'ba397f8f-487e-4bdc-9b7d-b397bb246e47',
+    }),
+    ApiBody({ type: EditUserSchemaDto }),
+    ApiResponse({
+      status: 200,
+      description: 'User edited successfully.',
+    }),
+    ApiResponse({
+      status: 409,
+      description: 'Already exists nickname.',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'Not Found - The requested user does not exist.',
+      content: {
+        'application/json': {
+          examples: {
+            userNotFound: {
+              summary: 'User not found',
+              value: { message: 'User not found.' },
+            },
+            adminNotFound: {
+              summary: 'User admin not found',
+              value: { message: 'User admin not found.' },
+            },
+          },
+        },
+      },
+    }),
+    ApiResponse({
+      status: 403,
+      description: 'User not admin.',
+    }),
+    ApiResponse({
+      status: 401,
+      description: 'Unauthorized.',
+    }),
+    ApiResponse({
+      status: 400,
+      description: 'Bad Request - Invalid input data.',
+    }),
+  )
+}
+
+class EditUserSchemaDto {
   @ApiProperty({
     example: 'Lucas Camargo',
     description: 'User name',
@@ -30,11 +87,12 @@ export class EditUserSchemaDto {
   password!: string
 
   @ApiProperty({
-    example: '1',
+    example: UserRole.Admin,
     description: 'User permission level',
-    type: Number,
+    enum: UserRole,
+    enumName: 'UserRole',
   })
-  role!: number
+  role!: UserRole
 
   @ApiProperty({
     example: 'true',
@@ -42,4 +100,11 @@ export class EditUserSchemaDto {
     type: Number,
   })
   active!: number
+
+  @ApiProperty({
+    description: 'Profile photo uploaded by the user',
+    type: 'string',
+    format: 'binary',
+  })
+  profilePhoto?: Buffer
 }

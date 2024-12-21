@@ -10,6 +10,7 @@ export class UserPresenter {
       nickname: user.nickname,
       role: user.role,
       active: user.active,
+      profilePhoto: user.profilePhoto,
       createdAt: user.createdAt,
       lastLogin: user.lastLogin,
     }

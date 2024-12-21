@@ -1,24 +1,25 @@
 import { makeUser } from 'test/factories/make-user'
-import { InMemoryUserRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { GetProfileUseCase } from './get-profile'
 
-let inMemoryUserRepository: InMemoryUserRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
 let sut: GetProfileUseCase
 
 describe('GetProfileUseCase', () => {
   beforeEach(() => {
-    inMemoryUserRepository = new InMemoryUserRepository()
-    sut = new GetProfileUseCase(inMemoryUserRepository)
+    inMemoryUsersRepository = new InMemoryUsersRepository()
+    sut = new GetProfileUseCase(inMemoryUsersRepository)
   })
 
   it('should be able to get the profile of an existing user', async () => {
     const user = makeUser()
-    await inMemoryUserRepository.create(user)
+    await inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
+      companyId: user.companyId.toString(),
       userAuthenticateId: user.id.toString(),
     })
 
@@ -30,6 +31,7 @@ describe('GetProfileUseCase', () => {
 
   it('should return an error if the user does not exist', async () => {
     const result = await sut.execute({
+      companyId: 'non-existent-company',
       userAuthenticateId: 'non-existent-id',
     })
 

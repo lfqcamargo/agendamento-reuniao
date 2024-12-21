@@ -33,11 +33,11 @@ describe('Get Profile (E2E)', () => {
     const company = await companyFactory.makePrismaCompany()
     const user = await userFactory.makePrismaUser({
       companyId: company.id,
-      role: 1,
       createdAt: new Date(),
     })
     const accessToken = jwt.sign({
       sub: user.id.toString(),
+      company: user.companyId.toString(),
     })
 
     const response = await request(app.getHttpServer())

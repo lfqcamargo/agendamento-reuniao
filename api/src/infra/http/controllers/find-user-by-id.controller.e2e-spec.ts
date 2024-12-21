@@ -33,10 +33,9 @@ describe('Find User By ID (E2E)', () => {
     const company = await companyFactory.makePrismaCompany()
     const user = await userFactory.makePrismaUser({
       companyId: company.id,
-      role: 1,
-      createdAt: new Date(),
     })
     const accessToken = jwt.sign({
+      company: user.companyId.toString(),
       sub: user.id.toString(),
     })
 

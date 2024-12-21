@@ -2,37 +2,38 @@ import { Injectable } from '@nestjs/common'
 
 import { Either, left, right } from '@/core/either'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { AlreadyExistsError } from '@/core/errors/already-exists-error'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
+import { UserNotAdminError } from '@/core/errors/user-not-admin-error'
 
-import { User } from '../../enterprise/entities/user'
+import { User, UserRole } from '../../enterprise/entities/user'
 import { HashGenerator } from '../cryptography/hash-generator'
-import { UserRepository } from '../repositories/user-repository'
-import { AlreadyExistsEmailError } from './errors/already-exists-email-error'
-import { AlreadyExistsNicknameError } from './errors/already-exists-nickname-error'
-import { InvalidRoleError } from './errors/invalid-role-error'
+import { UsersRepository } from '../repositories/users-repository'
 
 interface CreateUserUseCaseRequest {
+  companyId: string
   userAuthenticateId: string
   email: string
   name: string
   nickname: string
   password: string
-  role: number
+  role: UserRole
 }
 
 type CreateUserUseCaseResponse = Either<
-  AlreadyExistsEmailError | ResourceNotFoundError | AlreadyExistsNicknameError,
+  AlreadyExistsError | ResourceNotFoundError,
   null
 >
 
 @Injectable()
 export class CreateUserUseCase {
   constructor(
-    private userRepository: UserRepository,
+    private usersRepository: UsersRepository,
     private hashGenerator: HashGenerator,
   ) {}
 
   async execute({
+    companyId,
     userAuthenticateId,
     email,
     name,
@@ -40,38 +41,38 @@ export class CreateUserUseCase {
     password,
     role,
   }: CreateUserUseCaseRequest): Promise<CreateUserUseCaseResponse> {
-    const validRoles = [1, 2] // Admin (1), User (2)
-
-    if (!validRoles.includes(role)) {
-      return left(new InvalidRoleError())
-    }
-
-    const userAuthenticate =
-      await this.userRepository.findById(userAuthenticateId)
+    const userAuthenticate = await this.usersRepository.findById(
+      companyId,
+      userAuthenticateId,
+    )
 
     if (!userAuthenticate) {
       return left(new ResourceNotFoundError('User not found.'))
     }
 
-    const alreadyEmail = await this.userRepository.findByEmail(email)
-
-    if (alreadyEmail) {
-      return left(new AlreadyExistsEmailError())
+    if (!userAuthenticate.isAdmin()) {
+      return left(new UserNotAdminError())
     }
 
-    const alreadynickname = await this.userRepository.findByNickname(
-      userAuthenticate.companyId.toString(),
+    const alreadyEmail = await this.usersRepository.findByEmail(email)
+
+    if (alreadyEmail) {
+      return left(new AlreadyExistsError('Already exists email.'))
+    }
+
+    const alreadynickname = await this.usersRepository.findByNickname(
+      companyId,
       nickname,
     )
 
     if (alreadynickname) {
-      return left(new AlreadyExistsNicknameError())
+      return left(new AlreadyExistsError('Already exists email.'))
     }
 
     const hashedPassword = await this.hashGenerator.hash(password)
 
-    const user = User.create({
-      companyId: new UniqueEntityID(userAuthenticate.companyId.toString()),
+    const newUser = User.create({
+      companyId: new UniqueEntityID(companyId),
       email,
       name,
       nickname,
@@ -80,7 +81,7 @@ export class CreateUserUseCase {
       active: true,
     })
 
-    await this.userRepository.create(user)
+    await this.usersRepository.create(newUser)
 
     return right(null)
   }

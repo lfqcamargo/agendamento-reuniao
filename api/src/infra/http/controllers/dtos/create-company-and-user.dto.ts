@@ -1,45 +1,84 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { applyDecorators } from '@nestjs/common'
+import {
+  ApiBody,
+  ApiOperation,
+  ApiProperty,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
-export class CreateCompanyAndUserSchemaDto {
-  @ApiProperty({
-    example: '16877866000115',
-    description: 'Company CNPJ',
-    type: String,
-  })
-  cnpj!: string
+import { UserRole } from '@/domain/users/enterprise/entities/user'
 
-  @ApiProperty({
-    example: 'Tech Enterprise',
-    description: 'Company name',
-    type: String,
-  })
-  companyName!: string
+export const CreateCompanyAndUserDocs = () => {
+  return applyDecorators(
+    ApiTags('users'),
+    ApiOperation({
+      summary: 'Create the company and register the admin user.',
+    }),
+    ApiBody({ type: CreateCompanyAndUserDto }),
+    ApiResponse({
+      status: 201,
+      description: 'Company and user admin created successfully.',
+    }),
+    ApiResponse({
+      status: 409,
+      description: 'Conflict - Either the email or the CNPJ already exists.',
+      content: {
+        'application/json': {
+          examples: {
+            emailConflict: {
+              summary: 'Email already exists',
+              value: { message: 'Email already exists.' },
+            },
+            cnpjConflict: {
+              summary: 'CNPJ already exists',
+              value: { message: 'CNPJ already exists.' },
+            },
+          },
+        },
+      },
+    }),
+    ApiResponse({
+      status: 400,
+      description: 'Bad Request - Invalid input data.',
+    }),
+  )
+}
 
+class CreateCompanyAndUserDto {
   @ApiProperty({
     example: 'lfqcamargo@gmail.com',
-    description: 'Admin user email',
+    description: 'User email',
     type: String,
   })
   email!: string
 
   @ApiProperty({
     example: 'lfqcamargo',
-    description: 'Admin user name',
+    description: 'User name',
     type: String,
   })
-  userName!: string
+  name!: string
 
   @ApiProperty({
     example: 'lfqcamargo',
-    description: 'Admin nickname',
+    description: 'User nickname',
     type: String,
   })
   nickname!: string
 
   @ApiProperty({
     example: '123456789lfqcamargo',
-    description: 'Admin user password',
+    description: 'User password',
     type: String,
   })
   password!: string
+
+  @ApiProperty({
+    example: UserRole.Admin,
+    description: 'User permission level',
+    enum: UserRole,
+    enumName: 'UserRole',
+  })
+  role!: UserRole
 }

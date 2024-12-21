@@ -1,11 +1,11 @@
 import { FakeEncrypter } from 'test/cryptography/fake-encrypter'
 import { FakeHasher } from 'test/cryptography/fake-hasher'
 import { makeUser } from 'test/factories/make-user'
-import { InMemoryUserRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 
 import { AuthenticateUserUseCase } from './authenticate-user'
 
-let inMemoryUserRepository: InMemoryUserRepository
+let inMemoryUsersRepository: InMemoryUsersRepository
 let fakeHasher: FakeHasher
 let encrypter: FakeEncrypter
 
@@ -13,12 +13,12 @@ let sut: AuthenticateUserUseCase
 
 describe('Authenticate User', () => {
   beforeEach(() => {
-    inMemoryUserRepository = new InMemoryUserRepository()
+    inMemoryUsersRepository = new InMemoryUsersRepository()
     fakeHasher = new FakeHasher()
     encrypter = new FakeEncrypter()
 
     sut = new AuthenticateUserUseCase(
-      inMemoryUserRepository,
+      inMemoryUsersRepository,
       fakeHasher,
       encrypter,
     )
@@ -30,7 +30,7 @@ describe('Authenticate User', () => {
       password: await fakeHasher.hash('123456'),
     })
 
-    inMemoryUserRepository.items.push(user)
+    inMemoryUsersRepository.items.push(user)
 
     const result = await sut.execute({
       email: 'johndoe@example.com',

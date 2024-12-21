@@ -1,7 +1,6 @@
 import { AggregateRoot } from '@/core/entities/aggregate-root'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { AlreadyExistsError } from '@/core/errors/already-exists-error'
-import { UserNotCompanyError } from '@/core/errors/user-not-company'
 import { Optional } from '@/core/types/optional'
 
 import { MeetingParticipant } from './meeting-participant'
@@ -46,10 +45,6 @@ export class RoomScheduling extends AggregateRoot<RoomSchedulingProps> {
   }
 
   addParticipant(participant: MeetingParticipant) {
-    if (!participant.companyId.equals(this.companyId)) {
-      throw new UserNotCompanyError()
-    }
-
     if (this.props.participantsIds.exists(participant)) {
       throw new AlreadyExistsError('Participant already exists in the meeting.')
     }
