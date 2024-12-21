@@ -15,6 +15,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { UserPresenter } from '@/infra/database/prisma/presenters/user-presenter'
 
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
+import { FindUserByIdDocs } from './dtos/find-user-by-id.dto'
 
 const findUserByIdParam = z.object({
   userId: z.string().uuid(),
@@ -28,6 +29,7 @@ export class FindUserByIdController {
 
   @Get(':userId')
   @HttpCode(200)
+  @FindUserByIdDocs()
   async handle(
     @Param(new ZodValidationPipe(findUserByIdParam))
     params: FindUserByIdParam,

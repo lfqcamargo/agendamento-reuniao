@@ -45,11 +45,12 @@ describe('Fetch Users By Company ID (E2E)', () => {
     })
 
     const accessToken = jwt.sign({
+      company: user1.companyId.toString(),
       sub: user1.id.toString(),
     })
 
     const response = await request(app.getHttpServer())
-      .get('/users?page=1')
+      .get('/companies/users?page=1')
       .set('Authorization', `Bearer ${accessToken}`)
 
     expect(response.statusCode).toBe(200)
@@ -76,6 +77,13 @@ describe('Fetch Users By Company ID (E2E)', () => {
           lastLogin: user2.lastLogin?.toISOString() || null,
         }),
       ]),
+      meta: {
+        totalItems: 2,
+        itemCount: 2,
+        itemsPerPage: 20,
+        totalPages: 1,
+        currentPage: 1,
+      },
     })
   })
 })

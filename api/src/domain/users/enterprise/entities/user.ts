@@ -61,7 +61,10 @@ export class User extends Entity<UserProps> {
   }
 
   get lastLogin() {
-    return this.props.lastLogin
+    if (this.props.lastLogin) {
+      return this.props.lastLogin
+    }
+    return null
   }
 
   set name(name: string) {
@@ -86,6 +89,10 @@ export class User extends Entity<UserProps> {
 
   set profilePhoto(profilePhoto: Buffer | null) {
     this.props.profilePhoto = profilePhoto
+  }
+
+  set lastLogin(data: Date | null) {
+    this.props.lastLogin = data
   }
 
   isAdmin() {

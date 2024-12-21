@@ -14,7 +14,7 @@ import { CreateCompanyAndUserUseCase } from '@/domain/users/application/use-case
 import { CreateUserUseCase } from '@/domain/users/application/use-cases/create-user'
 import { DeleteUserUseCase } from '@/domain/users/application/use-cases/delete-user'
 import { EditUserUseCase } from '@/domain/users/application/use-cases/edit-user'
-// import { FetchUsersByCompanyIdUseCase } from '@/domain/users/application/use-cases/fetch-users-by-company-id'
+import { FetchUsersByCompanyIdUseCase } from '@/domain/users/application/use-cases/fetch-users-by-company-id'
 import { FindUserByIdUseCase } from '@/domain/users/application/use-cases/find-user-by-id'
 import { GetProfileUseCase } from '@/domain/users/application/use-cases/get-profile'
 import { CryptographyModule } from '@/infra/cryptography/cryptography.module'
@@ -33,7 +33,7 @@ import { DeleteUserController } from './controllers/delete-user.controller'
 // import { EditRoomController } from './controllers/edit-room.controller'
 import { EditUserController } from './controllers/edit-user.controller'
 // import { FetchRoomsByCompanyIdController } from './controllers/fetch-rooms-by-company-id.controller'
-// import { FetchUsersByCompanyIdController } from './controllers/fetch-users-by-company-id.controller'
+import { FetchUsersByCompanyIdController } from './controllers/fetch-users-by-company-id.controller'
 // import { FindRoomByIdController } from './controllers/find-room-by-id.controller'
 import { FindUserByIdController } from './controllers/find-user-by-id.controller'
 import { GetProfileController } from './controllers/get-profile.controller'
@@ -48,7 +48,7 @@ import { GetProfileController } from './controllers/get-profile.controller'
     EditUserController,
     DeleteUserController,
     FindUserByIdController,
-    // FetchUsersByCompanyIdController,
+    FetchUsersByCompanyIdController,
     // CreateRoomController,
     // DeleteRoomController,
     // EditRoomController,
@@ -67,7 +67,7 @@ import { GetProfileController } from './controllers/get-profile.controller'
     EditUserUseCase,
     DeleteUserUseCase,
     FindUserByIdUseCase,
-    // FetchUsersByCompanyIdUseCase,
+    FetchUsersByCompanyIdUseCase,
     // CreateRoomUseCase,
     // DeleteRoomUseCase,
     // EditRoomUseCase,

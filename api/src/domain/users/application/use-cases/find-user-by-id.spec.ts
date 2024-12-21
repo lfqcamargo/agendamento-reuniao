@@ -1,5 +1,5 @@
 import { makeUser } from 'test/factories/make-user'
-import { InMemoryUsersRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
@@ -19,8 +19,8 @@ describe('FindUserByIdUseCase', () => {
     await inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
-      userAuthenticateId: user.id.toString(),
-      id: user.id.toString(),
+      companyId: user.companyId.toString(),
+      userId: user.id.toString(),
     })
 
     expect(result.isRight()).toBe(true)
@@ -31,8 +31,8 @@ describe('FindUserByIdUseCase', () => {
 
   it('should return an error if the user is not found', async () => {
     const result = await sut.execute({
-      userAuthenticateId: 'non-existent-id',
-      id: 'non-existent-id',
+      companyId: 'non-existent-id',
+      userId: 'non-existent-id',
     })
 
     expect(result.isLeft()).toBe(true)

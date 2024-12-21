@@ -61,16 +61,35 @@ export class InMemoryUsersRepository implements UsersRepository {
     return users
   }
 
-  async fetchUsersByCompanyId(companyId: string, page: number) {
-    const users = this.items
-      .filter((item) => item.companyId.toString() === companyId)
-      .slice((page - 1) * 20, page * 20)
+  async fetchUsersByCompanyId(
+    companyId: string,
+    page: number,
+    itemsPerPage: number = 20,
+  ) {
+    const filteredUsers = this.items.filter(
+      (item) => item.companyId.toString() === companyId,
+    )
 
-    if (users.length === 0) {
-      return null
+    const totalItems = filteredUsers.length
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+    const paginatedUsers = filteredUsers.slice(
+      (page - 1) * itemsPerPage,
+      page * itemsPerPage,
+    )
+
+    const meta = {
+      totalItems,
+      itemCount: paginatedUsers.length,
+      itemsPerPage,
+      totalPages,
+      currentPage: page,
     }
 
-    return users
+    return {
+      data: paginatedUsers.length > 0 ? paginatedUsers : null,
+      meta,
+    }
   }
 
   async save(data: User) {

@@ -11,7 +11,8 @@
     "test:e2e:watch": "vitest --config ./vitest.config.e2e.ts",
     "dev": "nest start --watch",
     "debug": "nest start --debug --watch",
-    "prod": "node dist/main"
+    "prod": "node dist/main",
+    "seed": "ts-node -r tsconfig-paths/register --transpile-only prisma/seed.ts"
   },
   "author": "",
   "license": "ISC",

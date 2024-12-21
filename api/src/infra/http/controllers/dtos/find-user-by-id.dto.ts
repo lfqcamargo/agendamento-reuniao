@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-export const DeleteUserDocs = () => {
+export const FindUserByIdDocs = () => {
   return applyDecorators(
     ApiTags('users'),
     ApiBearerAuth(),

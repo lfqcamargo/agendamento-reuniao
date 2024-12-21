@@ -14,7 +14,17 @@ export abstract class UsersRepository {
   abstract fetchUsersByCompanyId(
     companyId: string,
     page: number,
-  ): Promise<User[] | null>
+    itemsPerPage?: number,
+  ): Promise<{
+    data: User[] | null
+    meta: {
+      totalItems: number
+      itemCount: number
+      itemsPerPage: number
+      totalPages: number
+      currentPage: number
+    }
+  } | null>
 
   abstract save(user: User): Promise<void>
   abstract delete(user: User): Promise<void>

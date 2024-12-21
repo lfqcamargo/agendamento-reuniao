@@ -87,23 +87,42 @@ export class PrismaUsersRepository implements UsersRepository {
     return usersAdmin.map(PrismaUserMapper.toDomain)
   }
 
-  async fetchUsersByCompanyId(companyId: string, page: number) {
+  async fetchUsersByCompanyId(
+    companyId: string,
+    page: number,
+    itemsPerPage: number = 20,
+  ) {
+    const totalItems = await this.prisma.user.count({
+      where: { companyId },
+    })
+
     const users = await this.prisma.user.findMany({
       where: {
         companyId,
       },
       orderBy: {
-        createdAt: 'asc',
+        name: 'asc',
       },
-      take: 20,
-      skip: (page - 1) * 20,
+      take: itemsPerPage,
+      skip: (page - 1) * itemsPerPage,
     })
 
     if (!users) {
       return null
     }
 
-    return users.map(PrismaUserMapper.toDomain)
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+    return {
+      data: users.map(PrismaUserMapper.toDomain),
+      meta: {
+        totalItems,
+        itemCount: users.length,
+        itemsPerPage,
+        totalPages,
+        currentPage: page,
+      },
+    }
   }
 
   async save(user: User): Promise<void> {
