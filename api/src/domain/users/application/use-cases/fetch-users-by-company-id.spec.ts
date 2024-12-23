@@ -35,6 +35,7 @@ describe('FetchUsersByCompanyIdUseCase', () => {
     const result = await sut.execute({
       companyId: user1.companyId.toString(),
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(result.isRight()).toBe(true)
@@ -48,6 +49,7 @@ describe('FetchUsersByCompanyIdUseCase', () => {
     const result = await sut.execute({
       companyId: 'non-existent-company',
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(result.isLeft()).toBe(true)
@@ -64,6 +66,7 @@ describe('FetchUsersByCompanyIdUseCase', () => {
     const result = await sut.execute({
       companyId: company.id.toString(),
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(result.isLeft()).toBe(true)
@@ -78,32 +81,48 @@ describe('FetchUsersByCompanyIdUseCase', () => {
     const user = makeUser({ companyId: company.id })
     await inMemoryCompaniesRepository.create(company)
     await inMemoryUsersRepository.create(user)
-    // Create 25 users for the same company
+
     for (let i = 1; i <= 24; i++) {
       const userCreate = makeUser({ companyId: user.companyId })
       await inMemoryUsersRepository.create(userCreate)
     }
 
-    // Page 1 should return the first 20 users
     const resultPage1 = await sut.execute({
       companyId: user.companyId.toString(),
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(resultPage1.isRight()).toBe(true)
     if (resultPage1.isRight()) {
-      expect(resultPage1.value.users).toHaveLength(20)
+      const { users, meta } = resultPage1.value
+      expect(users).toHaveLength(20)
+      expect(meta).toEqual({
+        totalItems: 25,
+        itemCount: 20,
+        itemsPerPage: 20,
+        totalPages: 2,
+        currentPage: 1,
+      })
     }
 
-    // Page 2 should return the remaining 5 users
     const resultPage2 = await sut.execute({
       companyId: user.companyId.toString(),
       page: 2,
+      itemsPerPage: 20,
     })
 
     expect(resultPage2.isRight()).toBe(true)
     if (resultPage2.isRight()) {
-      expect(resultPage2.value.users).toHaveLength(5)
+      const { users, meta } = resultPage2.value
+      expect(users).toHaveLength(5)
+      expect(meta).toEqual({
+        totalItems: 25,
+        itemCount: 5,
+        itemsPerPage: 20,
+        totalPages: 2,
+        currentPage: 2,
+      })
     }
   })
 })

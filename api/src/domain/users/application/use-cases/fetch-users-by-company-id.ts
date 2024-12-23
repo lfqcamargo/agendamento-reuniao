@@ -10,7 +10,7 @@ import { UsersRepository } from '../repositories/users-repository'
 interface FetchUsersByCompanyIdUseCaseRequest {
   companyId: string
   page: number
-  itemsPerPage?: number
+  itemsPerPage: number
 }
 
 type FetchUsersByCompanyIdUseCaseResponse = Either<

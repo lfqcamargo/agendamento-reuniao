@@ -5,11 +5,12 @@ import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { UsersRepository } from '@/domain/users/application/repositories/users-repository'
 
 import { Room } from '../../enterprise/entities/room'
-import { RoomRepository } from '../repositories/room-repository'
+import { RoomsRepository } from '../repositories/rooms-repository'
 
 interface FindRoomByIdUseCaseRequest {
-  userAuthenticateId: string
-  id: string
+  companyId: string
+  userId: string
+  roomId: string
 }
 
 type FindRoomByIdUseCaseResponse = Either<
@@ -23,27 +24,24 @@ type FindRoomByIdUseCaseResponse = Either<
 export class FindRoomByIdUseCase {
   constructor(
     private usersRepository: UsersRepository,
-    private roomRepository: RoomRepository,
+    private roomsRepository: RoomsRepository,
   ) {}
 
   async execute({
-    userAuthenticateId,
-    id,
+    companyId,
+    userId,
+    roomId,
   }: FindRoomByIdUseCaseRequest): Promise<FindRoomByIdUseCaseResponse> {
-    const user = await this.usersRepository.findById(userAuthenticateId)
+    const user = await this.usersRepository.findById(companyId, userId)
 
     if (!user) {
       return left(new ResourceNotFoundError('User not found.'))
     }
 
-    const room = await this.roomRepository.findById(id)
+    const room = await this.roomsRepository.findById(companyId, roomId)
 
     if (!room) {
       return left(new ResourceNotFoundError('Room not found.'))
-    }
-
-    if (user.companyId.toString() !== room.companyId.toString()) {
-      return left(new ResourceNotFoundError('User not found.'))
     }
 
     return right({

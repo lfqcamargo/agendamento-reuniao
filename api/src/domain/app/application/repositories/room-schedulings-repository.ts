@@ -1,8 +1,12 @@
 import { RoomScheduling } from '@/domain/app/enterprise/entities/room-scheduling'
 
-export abstract class RoomSchedulingRepository {
+export abstract class RoomSchedulingsRepository {
   abstract create(roomscheduling: RoomScheduling): Promise<void>
-  abstract findById(id: string): Promise<RoomScheduling | null>
+  abstract findById(
+    companyId: string,
+    id: string,
+  ): Promise<RoomScheduling | null>
+
   abstract fetchScheduledTimes(
     companyId: string,
     roomId: string,
@@ -12,4 +16,5 @@ export abstract class RoomSchedulingRepository {
 
   abstract save(roomscheduling: RoomScheduling): Promise<void>
   abstract delete(roomscheduling: RoomScheduling): Promise<void>
+  abstract deleteByRoomId(companyId: string, roomId: string): Promise<void>
 }

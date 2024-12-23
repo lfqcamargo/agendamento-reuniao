@@ -19,8 +19,8 @@ export class PrismaRoomMapper {
 
   static toPrisma(room: Room): Prisma.RoomUncheckedCreateInput {
     return {
-      id: room.id.toString(),
       companyId: room.companyId.toString(),
+      id: room.id.toString(),
       name: room.name,
       active: room.active,
     }

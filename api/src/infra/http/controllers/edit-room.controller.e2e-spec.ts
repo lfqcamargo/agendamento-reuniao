@@ -37,10 +37,16 @@ describe('Edit Room (E2E)', () => {
 
   test('[PATCH] /rooms/:id', async () => {
     const company = await companyFactory.makePrismaCompany()
-    const user = await userFactory.makePrismaUser({ companyId: company.id })
+    const user = await userFactory.makePrismaUser({
+      companyId: company.id,
+      role: 1,
+    })
     const room = await roomFactory.makePrismaRoom({ companyId: company.id })
 
-    const accessToken = jwt.sign({ sub: user.id.toString() })
+    const accessToken = jwt.sign({
+      sub: user.id.toString(),
+      company: user.companyId.toString(),
+    })
 
     const response = await request(app.getHttpServer())
       .patch(`/rooms/${room.id.toString()}`)

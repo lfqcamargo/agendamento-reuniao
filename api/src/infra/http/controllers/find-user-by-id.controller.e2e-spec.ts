@@ -29,10 +29,11 @@ describe('Find User By ID (E2E)', () => {
     await app.init()
   })
 
-  test('[GET] /users/:id', async () => {
+  test('[GET] /users/:userId', async () => {
     const company = await companyFactory.makePrismaCompany()
     const user = await userFactory.makePrismaUser({
       companyId: company.id,
+      name: 'Lucas Camargo',
     })
     const accessToken = jwt.sign({
       company: user.companyId.toString(),

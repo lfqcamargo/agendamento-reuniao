@@ -1,24 +1,21 @@
 import { makeRoom } from 'test/factories/make-room'
 import { makeUser } from 'test/factories/make-user'
-import { InMemoryRoomRepository } from 'test/repositories/in-memory-room-repository'
-import { InMemoryUsersRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemoryRoomsRepository } from 'test/repositories/in-memory-rooms-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { FetchRoomsByCompanyIdUseCase } from './fetch-rooms-by-company-id'
 
 let inMemoryUsersRepository: InMemoryUsersRepository
-let inMemoryRoomRepository: InMemoryRoomRepository
+let inMemoryRoomsRepository: InMemoryRoomsRepository
 let sut: FetchRoomsByCompanyIdUseCase
 
 describe('FetchRoomsByCompanyIdUseCase', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryRoomRepository = new InMemoryRoomRepository()
-    sut = new FetchRoomsByCompanyIdUseCase(
-      inMemoryUsersRepository,
-      inMemoryRoomRepository,
-    )
+    inMemoryRoomsRepository = new InMemoryRoomsRepository()
+    sut = new FetchRoomsByCompanyIdUseCase(inMemoryRoomsRepository)
   })
 
   it('should fetch rooms by company ID', async () => {
@@ -28,13 +25,14 @@ describe('FetchRoomsByCompanyIdUseCase', () => {
     const room3 = makeRoom()
 
     await inMemoryUsersRepository.create(user)
-    await inMemoryRoomRepository.create(room1)
-    await inMemoryRoomRepository.create(room2)
-    await inMemoryRoomRepository.create(room3)
+    await inMemoryRoomsRepository.create(room1)
+    await inMemoryRoomsRepository.create(room2)
+    await inMemoryRoomsRepository.create(room3)
 
     const result = await sut.execute({
-      userAuthenticateId: user.id.toString(),
+      companyId: user.companyId.toString(),
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(result.isRight()).toBe(true)
@@ -44,27 +42,15 @@ describe('FetchRoomsByCompanyIdUseCase', () => {
     }
   })
 
-  it('should return an error if user is not found', async () => {
-    const result = await sut.execute({
-      userAuthenticateId: 'non-existent-user',
-      page: 1,
-    })
-
-    expect(result.isLeft()).toBe(true)
-    if (result.isLeft()) {
-      expect(result.value).toBeInstanceOf(ResourceNotFoundError)
-      expect(result.value.message).toBe('User not found.')
-    }
-  })
-
   it('should return an error if no rooms are found for the company', async () => {
     const user = makeUser()
 
     await inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
-      userAuthenticateId: user.id.toString(),
+      companyId: user.companyId.toString(),
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(result.isLeft()).toBe(true)
@@ -81,27 +67,45 @@ describe('FetchRoomsByCompanyIdUseCase', () => {
 
     for (let i = 0; i < 25; i++) {
       const room = makeRoom({ companyId: user.companyId })
-      await inMemoryRoomRepository.create(room)
+      await inMemoryRoomsRepository.create(room)
     }
 
     const resultPage1 = await sut.execute({
-      userAuthenticateId: user.id.toString(),
+      companyId: user.companyId.toString(),
       page: 1,
+      itemsPerPage: 20,
     })
 
     expect(resultPage1.isRight()).toBe(true)
     if (resultPage1.isRight()) {
-      expect(resultPage1.value.rooms).toHaveLength(20)
+      const { rooms, meta } = resultPage1.value
+      expect(rooms).toHaveLength(20)
+      expect(meta).toEqual({
+        totalItems: 25,
+        itemCount: 20,
+        itemsPerPage: 20,
+        totalPages: 2,
+        currentPage: 1,
+      })
     }
 
     const resultPage2 = await sut.execute({
-      userAuthenticateId: user.id.toString(),
+      companyId: user.companyId.toString(),
       page: 2,
+      itemsPerPage: 20,
     })
 
     expect(resultPage2.isRight()).toBe(true)
     if (resultPage2.isRight()) {
-      expect(resultPage2.value.rooms).toHaveLength(5)
+      const { rooms, meta } = resultPage2.value
+      expect(rooms).toHaveLength(5)
+      expect(meta).toEqual({
+        totalItems: 25,
+        itemCount: 5,
+        itemsPerPage: 20,
+        totalPages: 2,
+        currentPage: 2,
+      })
     }
   })
 })

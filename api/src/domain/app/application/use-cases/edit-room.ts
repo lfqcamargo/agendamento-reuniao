@@ -3,13 +3,13 @@ import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@/core/either'
 import { AlreadyExistsError } from '@/core/errors/already-exists-error'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
-import { UserNotAdminError } from '@/core/errors/user-not-admin'
-import { UserNotCompanyError } from '@/core/errors/user-not-company'
+import { UserNotAdminError } from '@/core/errors/user-not-admin-error'
 import { UsersRepository } from '@/domain/users/application/repositories/users-repository'
 
-import { RoomRepository } from '../repositories/room-repository'
+import { RoomsRepository } from '../repositories/rooms-repository'
 
 interface EditRoomUseCaseRequest {
+  companyId: string
   userId: string
   roomId: string
   name?: string
@@ -17,51 +17,42 @@ interface EditRoomUseCaseRequest {
 }
 
 type EditRoomUseCaseResponse = Either<
-  | ResourceNotFoundError
-  | UserNotAdminError
-  | AlreadyExistsError
-  | UserNotCompanyError,
+  ResourceNotFoundError | UserNotAdminError | AlreadyExistsError,
   null
 >
 
 @Injectable()
 export class EditRoomUseCase {
   constructor(
-    private roomRepository: RoomRepository,
+    private roomRepository: RoomsRepository,
     private usersRepository: UsersRepository,
   ) {}
 
   async execute({
+    companyId,
     userId,
     roomId,
     name,
     active,
   }: EditRoomUseCaseRequest): Promise<EditRoomUseCaseResponse> {
-    const room = await this.roomRepository.findById(roomId)
+    const room = await this.roomRepository.findById(companyId, roomId)
 
     if (!room) {
       return left(new ResourceNotFoundError('Room not found.'))
     }
 
-    const user = await this.usersRepository.findById(userId)
+    const user = await this.usersRepository.findById(companyId, userId)
 
     if (!user) {
       return left(new ResourceNotFoundError('User not found.'))
     }
 
-    if (user.role !== 1) {
+    if (!user.isAdmin()) {
       return left(new UserNotAdminError())
     }
 
-    if (user.companyId.toString() !== room.companyId.toString()) {
-      return left(new UserNotCompanyError())
-    }
-
     if (name) {
-      const alreadyName = await this.roomRepository.findByName(
-        user.companyId.toString(),
-        name,
-      )
+      const alreadyName = await this.roomRepository.findByName(companyId, name)
 
       if (alreadyName) {
         return left(new AlreadyExistsError('Room name already exists.'))
@@ -70,7 +61,7 @@ export class EditRoomUseCase {
       room.name = name
     }
 
-    if (active) {
+    if (active !== undefined) {
       room.active = active
     }
 

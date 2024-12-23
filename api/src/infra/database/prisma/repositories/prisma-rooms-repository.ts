@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common'
 
-import { RoomRepository } from '@/domain/app/application/repositories/room-repository'
+import { RoomSchedulingsRepository } from '@/domain/app/application/repositories/room-schedulings-repository'
+import { RoomsRepository } from '@/domain/app/application/repositories/rooms-repository'
 import { Room } from '@/domain/app/enterprise/entities/room'
 
 import { PrismaRoomMapper } from '../mappers/prisma-room-mapper'
 import { PrismaService } from '../prisma-service'
 
 @Injectable()
-export class PrismaRoomRepository implements RoomRepository {
-  constructor(private prisma: PrismaService) {}
+export class PrismaRoomRepository implements RoomsRepository {
+  constructor(
+    private prisma: PrismaService,
+    private roomSchedulingsRepository: RoomSchedulingsRepository,
+  ) {}
 
   async create(room: Room): Promise<void> {
     const data = PrismaRoomMapper.toPrisma(room)
@@ -18,9 +22,10 @@ export class PrismaRoomRepository implements RoomRepository {
     })
   }
 
-  async findById(id: string): Promise<Room | null> {
+  async findById(companyId: string, id: string): Promise<Room | null> {
     const room = await this.prisma.room.findUnique({
       where: {
+        companyId,
         id,
       },
     })
@@ -47,7 +52,15 @@ export class PrismaRoomRepository implements RoomRepository {
     return PrismaRoomMapper.toDomain(room)
   }
 
-  async fetchByCompany(companyId: string, page: number) {
+  async fetchByCompanyId(
+    companyId: string,
+    page: number,
+    itemsPerPage: number = 20,
+  ) {
+    const totalItems = await this.prisma.room.count({
+      where: { companyId },
+    })
+
     const rooms = await this.prisma.room.findMany({
       where: {
         companyId,
@@ -55,19 +68,37 @@ export class PrismaRoomRepository implements RoomRepository {
       orderBy: {
         name: 'asc',
       },
-      take: 20,
-      skip: (page - 1) * 20,
+      take: itemsPerPage,
+      skip: (page - 1) * itemsPerPage,
     })
 
     if (!rooms) {
       return null
     }
 
-    return rooms.map(PrismaRoomMapper.toDomain)
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+    return {
+      data: rooms.map(PrismaRoomMapper.toDomain),
+      meta: {
+        totalItems,
+        itemCount: rooms.length,
+        itemsPerPage,
+        totalPages,
+        currentPage: page,
+      },
+    }
   }
 
   async save(room: Room): Promise<void> {
     const data = PrismaRoomMapper.toPrisma(room)
+
+    if (room.active === false) {
+      await this.roomSchedulingsRepository.deleteByRoomId(
+        room.companyId.toString(),
+        room.id.toString(),
+      )
+    }
 
     await this.prisma.room.update({
       where: {

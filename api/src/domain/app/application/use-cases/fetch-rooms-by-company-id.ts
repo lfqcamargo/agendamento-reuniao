@@ -2,51 +2,52 @@ import { Injectable } from '@nestjs/common'
 
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
-import { UsersRepository } from '@/domain/users/application/repositories/users-repository'
 
 import { Room } from '../../enterprise/entities/room'
-import { RoomRepository } from '../repositories/room-repository'
+import { RoomsRepository } from '../repositories/rooms-repository'
 
 interface FetchRoomsByCompanyIdUseCaseRequest {
-  userAuthenticateId: string
+  companyId: string
   page: number
+  itemsPerPage: number
 }
 
 type FetchRoomsByCompanyIdUseCaseResponse = Either<
   ResourceNotFoundError,
   {
     rooms: Room[]
+    meta: {
+      totalItems: number
+      itemCount: number
+      itemsPerPage: number
+      totalPages: number
+      currentPage: number
+    }
   }
 >
 
 @Injectable()
 export class FetchRoomsByCompanyIdUseCase {
-  constructor(
-    private usersRepository: UsersRepository,
-    private roomRepository: RoomRepository,
-  ) {}
+  constructor(private roomsRepository: RoomsRepository) {}
 
   async execute({
-    userAuthenticateId,
+    companyId,
     page,
+    itemsPerPage,
   }: FetchRoomsByCompanyIdUseCaseRequest): Promise<FetchRoomsByCompanyIdUseCaseResponse> {
-    const user = await this.usersRepository.findById(userAuthenticateId)
-
-    if (!user) {
-      return left(new ResourceNotFoundError('User not found.'))
-    }
-
-    const rooms = await this.roomRepository.fetchByCompany(
-      user.companyId.toString(),
+    const result = await this.roomsRepository.fetchByCompanyId(
+      companyId,
       page,
+      itemsPerPage,
     )
 
-    if (!rooms) {
+    if (!result || !result.data) {
       return left(new ResourceNotFoundError('No rooms found.'))
     }
 
     return right({
-      rooms,
+      rooms: result.data,
+      meta: result.meta,
     })
   }
 }

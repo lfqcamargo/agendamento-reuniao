@@ -32,12 +32,19 @@ describe('Find Room By ID (E2E)', () => {
     await app.init()
   })
 
-  test('[GET] /rooms/:id', async () => {
+  test('[GET] /rooms/:roomId', async () => {
     const company = await companyFactory.makePrismaCompany()
     const user = await userFactory.makePrismaUser({ companyId: company.id })
-    const room = await roomFactory.makePrismaRoom({ companyId: company.id })
+    const room = await roomFactory.makePrismaRoom({
+      companyId: company.id,
+      name: 'Lucas Camargo',
+      active: true,
+    })
 
-    const accessToken = jwt.sign({ sub: user.id.toString() })
+    const accessToken = jwt.sign({
+      company: user.companyId.toString(),
+      sub: user.id.toString(),
+    })
 
     const response = await request(app.getHttpServer())
       .get(`/rooms/${room.id.toString()}`)
@@ -47,7 +54,6 @@ describe('Find Room By ID (E2E)', () => {
     expect(response.body).toEqual({
       room: expect.objectContaining({
         id: room.id.toString(),
-        companyId: company.id.toString(),
         name: room.name,
         active: room.active,
       }),

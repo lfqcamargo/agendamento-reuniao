@@ -1,4 +1,4 @@
-import { RoomSchedulingRepository } from '@/domain/app/application/repositories/room-scheduling-repository'
+import { RoomSchedulingRepository } from '@/domain/app/application/repositories/room-schedulings-repository'
 import { RoomScheduling } from '@/domain/app/enterprise/entities/room-scheduling'
 
 export class InMemoryRoomSchedulingRepository

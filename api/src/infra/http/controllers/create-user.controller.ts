@@ -41,8 +41,8 @@ export class CreateUserController {
     body: CreateUserSchema,
     @CurrentUser() user: UserPayload,
   ) {
-    const { email, name, nickname, password, role } = body
     const { company: companyId, sub: userAuthenticateId } = user
+    const { email, name, nickname, password, role } = body
 
     const result = await this.createUserUseCase.execute({
       companyId,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 
-import { RoomSchedulingRepository } from '@/domain/app/application/repositories/room-scheduling-repository'
+import { RoomSchedulingsRepository } from '@/domain/app/application/repositories/room-schedulings-repository'
 import { RoomScheduling } from '@/domain/app/enterprise/entities/room-scheduling'
 
 import { PrismaRoomSchedulingMapper } from '../mappers/prisma-room-scheduling-mapper'
@@ -8,7 +8,7 @@ import { PrismaService } from '../prisma-service'
 
 @Injectable()
 export class PrismaRoomSchedulingRepository
-  implements RoomSchedulingRepository
+  implements RoomSchedulingsRepository
 {
   constructor(private prisma: PrismaService) {}
 
@@ -74,6 +74,15 @@ export class PrismaRoomSchedulingRepository
     await this.prisma.roomScheduling.delete({
       where: {
         id: roomscheduling.id.toString(),
+      },
+    })
+  }
+
+  async deleteByRoomId(companyId: string, roomId: string): Promise<void> {
+    await this.prisma.roomScheduling.deleteMany({
+      where: {
+        companyId,
+        roomId,
       },
     })
   }

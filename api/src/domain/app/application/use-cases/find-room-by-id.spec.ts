@@ -1,23 +1,23 @@
 import { makeRoom } from 'test/factories/make-room'
 import { makeUser } from 'test/factories/make-user'
-import { InMemoryRoomRepository } from 'test/repositories/in-memory-room-repository'
-import { InMemoryUsersRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemoryRoomsRepository } from 'test/repositories/in-memory-rooms-repository'
+import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 
 import { FindRoomByIdUseCase } from './find-room-by-id'
 
 let inMemoryUsersRepository: InMemoryUsersRepository
-let inMemoryRoomRepository: InMemoryRoomRepository
+let inMemoryRoomsRepository: InMemoryRoomsRepository
 let sut: FindRoomByIdUseCase
 
 describe('FindRoomByIdUseCase', () => {
   beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository()
-    inMemoryRoomRepository = new InMemoryRoomRepository()
+    inMemoryRoomsRepository = new InMemoryRoomsRepository()
     sut = new FindRoomByIdUseCase(
       inMemoryUsersRepository,
-      inMemoryRoomRepository,
+      inMemoryRoomsRepository,
     )
   })
 
@@ -25,11 +25,12 @@ describe('FindRoomByIdUseCase', () => {
     const user = makeUser()
     const room = makeRoom({ companyId: user.companyId })
     await inMemoryUsersRepository.create(user)
-    await inMemoryRoomRepository.create(room)
+    await inMemoryRoomsRepository.create(room)
 
     const result = await sut.execute({
-      userAuthenticateId: user.id.toString(),
-      id: room.id.toString(),
+      companyId: user.companyId.toString(),
+      userId: user.id.toString(),
+      roomId: room.id.toString(),
     })
 
     expect(result.isRight()).toBe(true)
@@ -42,8 +43,9 @@ describe('FindRoomByIdUseCase', () => {
     const room = makeRoom()
 
     const result = await sut.execute({
-      userAuthenticateId: 'non-existent-id',
-      id: room.id.toString(),
+      companyId: 'non-existent-company',
+      userId: 'non-existent-id',
+      roomId: room.id.toString(),
     })
 
     expect(result.isLeft()).toBe(true)
@@ -58,8 +60,9 @@ describe('FindRoomByIdUseCase', () => {
     await inMemoryUsersRepository.create(user)
 
     const result = await sut.execute({
-      userAuthenticateId: user.id.toString(),
-      id: 'non-existent-id',
+      companyId: user.companyId.toString(),
+      userId: user.id.toString(),
+      roomId: 'non-existent-id',
     })
 
     expect(result.isLeft()).toBe(true)
