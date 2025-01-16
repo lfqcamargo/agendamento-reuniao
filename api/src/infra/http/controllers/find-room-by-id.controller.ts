@@ -15,6 +15,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { RoomPresenter } from '@/infra/http/presenters/room-presenter'
 
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
+import { FindRoomByIdDocs } from './dtos/find-room-by-id.dto'
 
 const roomQueryParamSchema = z.object({ roomId: z.string().uuid() })
 
@@ -26,6 +27,7 @@ export class FindRoomByIdController {
 
   @Get(':roomId')
   @HttpCode(200)
+  @FindRoomByIdDocs()
   async handle(
     @Param(new ZodValidationPipe(roomQueryParamSchema))
     params: QueryValidationPipe,

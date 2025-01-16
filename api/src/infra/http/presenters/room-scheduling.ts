@@ -1,14 +1,14 @@
-import { RoomScheduling } from '@/domain/app/enterprise/entities/room-scheduling'
+import { Meeting } from '@/domain/app/enterprise/entities/meeting'
 
-export class RoomSchedulingPresenter {
-  static toHTTP(roomscheduling: RoomScheduling) {
+export class MeetingPresenter {
+  static toHTTP(meeting: Meeting) {
     return {
-      companyId: roomscheduling.companyId.toString(),
-      id: roomscheduling.id.toString(),
-      creatorId: roomscheduling.creatorId.toString(),
-      roomId: roomscheduling.roomId.toString(),
-      startTime: roomscheduling.startTime,
-      endTime: roomscheduling.endTime,
+      companyId: meeting.companyId.toString(),
+      id: meeting.id.toString(),
+      creatorId: meeting.creatorId.toString(),
+      roomId: meeting.roomId.toString(),
+      startTime: meeting.startTime,
+      endTime: meeting.endTime,
     }
   }
 }

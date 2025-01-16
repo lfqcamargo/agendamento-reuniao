@@ -21,7 +21,7 @@ model Company {
 
   users              User[]
   room               Room[]
-  roomScheduling     RoomScheduling[]
+  meeting            Meeting[]
   meetingParticipant MeetingParticipant[]
 
   @@map("companies")
@@ -41,7 +41,7 @@ model User {
   lastLogin    DateTime? @map("last_login")
 
   company            Company              @relation(fields: [companyId], references: [id])
-  roomScheduling     RoomScheduling[]
+  meeting            Meeting[]
   meetingParticipant MeetingParticipant[]
 
   @@map("users")
@@ -58,7 +58,7 @@ model Room {
   @@map("rooms")
 }
 
-model RoomScheduling {
+model Meeting {
   id        String   @id @default(uuid())
   companyId String   @map("company_id")
   creatorId String
@@ -74,14 +74,14 @@ model RoomScheduling {
 }
 
 model MeetingParticipant {
-  id               String @id @default(uuid())
-  companyId        String @map("company_id")
-  participantId    String @map("participant_id")
-  roomSchedulingId String @map("room_schedules_id")
+  id            String @id @default(uuid())
+  companyId     String @map("company_id")
+  participantId String @map("participant_id")
+  meetingId     String @map("room_schedules_id")
 
-  company        Company        @relation(fields: [companyId], references: [id])
-  participant    User           @relation(fields: [participantId], references: [id])
-  roomScheduling RoomScheduling @relation(fields: [roomSchedulingId], references: [id])
+  company     Company @relation(fields: [companyId], references: [id])
+  participant User    @relation(fields: [participantId], references: [id])
+  meeting     Meeting @relation(fields: [meetingId], references: [id])
 
   @@map("meeting_participants")
 }

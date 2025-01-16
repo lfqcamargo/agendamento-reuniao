@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
 
-// import { AddParticipantUseCase } from '@/domain/app/application/use-cases/add-participant'
-// import { CreateMeetingUseCase } from '@/domain/app/application/use-cases/create-meeting'
+import { AddParticipantUseCase } from '@/domain/app/application/use-cases/add-participant'
+import { CreateMeetingUseCase } from '@/domain/app/application/use-cases/create-meeting'
 import { CreateRoomUseCase } from '@/domain/app/application/use-cases/create-room'
-// import { DeleteMeetingUseCase } from '@/domain/app/application/use-cases/delete-meeting'
+import { DeleteMeetingUseCase } from '@/domain/app/application/use-cases/delete-meeting'
 // import { DeleteParticipantUseCase } from '@/domain/app/application/use-cases/delete-participant'
 import { DeleteRoomUseCase } from '@/domain/app/application/use-cases/delete-room'
 import { EditRoomUseCase } from '@/domain/app/application/use-cases/edit-room'
@@ -20,13 +20,13 @@ import { GetProfileUseCase } from '@/domain/users/application/use-cases/get-prof
 import { CryptographyModule } from '@/infra/cryptography/cryptography.module'
 import { DatabaseModule } from '@/infra/database/database.module'
 
-// import { AddParticipantController } from './controllers/add-participant.controller'
+import { AddParticipantController } from './controllers/add-participant.controller'
 import { AuthenticateController } from './controllers/authenticate.controller'
 import { CreateCompanyAndUserController } from './controllers/create-company-and-user.controller'
-// import { CreateMeetingController } from './controllers/create-meeting.controller'
+import { CreateMeetingController } from './controllers/create-meeting.controller'
 import { CreateRoomController } from './controllers/create-room.controller'
 import { CreateUserController } from './controllers/create-user.controller'
-// import { DeleteMeetingController } from './controllers/delete-meeting.controller'
+import { DeleteMeetingController } from './controllers/delete-meeting.controller'
 // import { DeleteParticipantController } from './controllers/delete-participant.controller'
 import { DeleteRoomController } from './controllers/delete-room.controller'
 import { DeleteUserController } from './controllers/delete-user.controller'
@@ -54,9 +54,9 @@ import { GetProfileController } from './controllers/get-profile.controller'
     EditRoomController,
     FetchRoomsByCompanyIdController,
     FindRoomByIdController,
-    // CreateMeetingController,
-    // DeleteMeetingController,
-    // AddParticipantController,
+    CreateMeetingController,
+    DeleteMeetingController,
+    AddParticipantController,
     // DeleteParticipantController,
   ],
   providers: [
@@ -73,9 +73,9 @@ import { GetProfileController } from './controllers/get-profile.controller'
     EditRoomUseCase,
     FetchRoomsByCompanyIdUseCase,
     FindRoomByIdUseCase,
-    // CreateMeetingUseCase,
-    // DeleteMeetingUseCase,
-    // AddParticipantUseCase,
+    CreateMeetingUseCase,
+    DeleteMeetingUseCase,
+    AddParticipantUseCase,
     // DeleteParticipantUseCase,
   ],
 })

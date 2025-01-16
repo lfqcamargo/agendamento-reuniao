@@ -4,7 +4,8 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 export interface MeetingParticipantProps {
   companyId: UniqueEntityID
   participantId: UniqueEntityID
-  roomSchedulingId: UniqueEntityID
+  meetingId: UniqueEntityID
+  accept?: boolean
 }
 
 export class MeetingParticipant extends Entity<MeetingParticipantProps> {
@@ -16,12 +17,20 @@ export class MeetingParticipant extends Entity<MeetingParticipantProps> {
     return this.props.participantId
   }
 
-  get roomSchedulingId() {
-    return this.props.roomSchedulingId
+  get meetingId() {
+    return this.props.meetingId
+  }
+
+  get accept() {
+    return this.props.accept
   }
 
   set participantId(participantId: UniqueEntityID) {
     this.props.participantId = participantId
+  }
+
+  set accept(accept: boolean | undefined) {
+    this.props.accept = accept
   }
 
   static create(props: MeetingParticipantProps, id?: UniqueEntityID) {

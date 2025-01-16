@@ -11,6 +11,9 @@ export class PrismaMeetingParticipantsRepository
   implements MeetingParticipantsRepository
 {
   constructor(private prisma: PrismaService) {}
+  createMany(meetingParticipant: MeetingParticipant): Promise<void> {
+    throw new Error('Method not implemented.')
+  }
 
   async create(meetingParticipant: MeetingParticipant): Promise<void> {
     const data = PrismaMeetingParticipantMapper.toPrisma(meetingParticipant)
@@ -36,12 +39,12 @@ export class PrismaMeetingParticipantsRepository
 
   async fetchParticipants(
     companyId: string,
-    roomSchedulingId: string,
+    meetingId: string,
   ): Promise<MeetingParticipant[] | null> {
     const participants = await this.prisma.meetingParticipant.findMany({
       where: {
         companyId,
-        roomSchedulingId,
+        meetingId,
       },
     })
 

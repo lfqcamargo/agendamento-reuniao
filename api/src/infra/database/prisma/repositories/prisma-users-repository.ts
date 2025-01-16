@@ -107,7 +107,7 @@ export class PrismaUsersRepository implements UsersRepository {
       skip: (page - 1) * itemsPerPage,
     })
 
-    if (!users) {
+    if (!users.length) {
       return null
     }
 

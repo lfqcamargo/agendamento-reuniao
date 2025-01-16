@@ -52,7 +52,6 @@ describe('Delete Room (E2E)', () => {
       .delete(`/rooms/${room.id.toString()}`)
       .set('Authorization', `Bearer ${accessToken}`)
 
-    console.log(response.body)
     expect(response.statusCode).toBe(204)
 
     const roomOnDatabase = await prisma.room.findUnique({

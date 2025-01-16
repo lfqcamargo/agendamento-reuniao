@@ -6,7 +6,7 @@ export class MeetingParticipantPresenter {
       companyId: meetingparticipant.companyId.toString(),
       id: meetingparticipant.id.toString(),
       participantId: meetingparticipant.participantId.toString(),
-      roomSchedulingId: meetingparticipant.roomSchedulingId.toString(),
+      meetingId: meetingparticipant.meetingId.toString(),
     }
   }
 }

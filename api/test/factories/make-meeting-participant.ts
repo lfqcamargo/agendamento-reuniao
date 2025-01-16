@@ -15,8 +15,7 @@ export function makeMeetingParticipant(
       companyId: override.companyId || new UniqueEntityID(faker.string.uuid()),
       participantId:
         override.participantId || new UniqueEntityID(faker.string.uuid()),
-      roomSchedulingId:
-        override.roomSchedulingId || new UniqueEntityID(faker.string.uuid()),
+      meetingId: override.meetingId || new UniqueEntityID(faker.string.uuid()),
     },
     id,
   )

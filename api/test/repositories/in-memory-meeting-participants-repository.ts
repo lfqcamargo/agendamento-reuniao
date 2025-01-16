@@ -25,7 +25,7 @@ export class InMemoryMeetingParticipantsRepository
     const participants = this.items.filter(
       (item) =>
         item.companyId.toString() === companyId &&
-        item.roomSchedulingId.toString() === schedulesRoomId,
+        item.meetingId.toString() === schedulesRoomId,
     )
 
     if (participants.length === 0) {
